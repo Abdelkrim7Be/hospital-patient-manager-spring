@@ -20,7 +20,24 @@ public class HospitalApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        //First method
+        Patient patient1 = new Patient();
+        patient1.setId(null);
+        patient1.setName("Bellagnech");
+        patient1.setBirthDate(new Date());
+        patient1.setSick(false);
+        patient1.setScore(15);
 
+        //Second method
+        Patient patient2 = new Patient(null, "Elboubkari", new Date(), true, 20);
+
+        //Third Method (Using Builder)
+        Patient patient3 = Patient.builder()
+                .name("Boukhari")
+                .birthDate(new Date())
+                .sick(false)
+                .score(18)
+                .build();
     }
 
 }

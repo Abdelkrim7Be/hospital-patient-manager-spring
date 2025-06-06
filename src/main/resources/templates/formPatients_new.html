@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html
+  lang="fr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Formulaire Patient - Système Hospitalier ENSET"
+    />
+    <meta
+      name="keywords"
+      content="patient, formulaire, hôpital, dossier médical, ENSET"
+    />
+
+    <!-- Hospital Form CSS -->
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/black-white-theme.css" />
+
+    <title
+      th:text="${patient.id != null ? '✏️ Modifier Patient - ' + ${patient.name} : '➕ Nouveau Patient'} + ' - Système Hospitalier'"
+    >
+      📝 Formulaire Patient - Système Hospitalier ENSET
+    </title>
+
+    <!-- Hospital Form Styles -->
+    <style>
+      .hospital-form-header {
+        background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+        padding: 2rem;
+      }
+
+      .medical-form-section {
+        background: #f8f9fa;
+        border-left: 4px solid #0d6efd;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.5rem;
+      }
+
+      .medical-form-section h6 {
+        color: #0d6efd;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+      }
+
+      .invalid-feedback {
+        display: block;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      .health-score-slider {
+        background: linear-gradient(
+          to right,
+          #dc3545 0%,
+          #ffc107 50%,
+          #198754 100%
+        );
+        height: 8px;
+        border-radius: 4px;
+      }
+
+      .health-status-toggle {
+        display: flex;
+        background: #e9ecef;
+        border-radius: 2rem;
+        padding: 0.25rem;
+      }
+
+      .health-status-option {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 1.5rem;
+        border: none;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .health-status-option.active.healthy {
+        background: #198754;
+        color: white;
+      }
+
+      .health-status-option.active.sick {
+        background: #dc3545;
+        color: white;
+      }
+
+      .patient-preview {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px dashed #dee2e6;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+      }
+
+      .medical-actions {
+        background: #ffffff;
+        border-top: 3px solid #0d6efd;
+        padding: 1.5rem;
+        border-radius: 0 0 1rem 1rem;
+      }
+
+      .form-floating label {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .form-floating .form-control:focus ~ label,
+      .form-floating .form-control:not(:placeholder-shown) ~ label {
+        color: #0d6efd;
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Hospital Patient Form Content -->
+    <div layout:fragment="content1">
+      <div class="container py-4">
+        <div class="row justify-content-center">
+          <div class="col-xl-10">
+            <!-- Hospital Form Header -->
+            <section class="hospital-form-header shadow-lg mb-0">
+              <div class="row align-items-center">
+                <div class="col-lg-8">
+                  <h1 class="display-6 fw-bold mb-2">
+                    <i
+                      th:class="${patient.id != null ? 'bi bi-pencil-square' : 'bi bi-person-plus-fill'} + ' me-3'"
+                    ></i>
+                    <span
+                      th:text="${patient.id != null ? 'Modification du Dossier Patient' : 'Nouveau Dossier Patient'}"
+                    >
+                      📝 Formulaire Patient
+                    </span>
+                  </h1>
+                  <p class="lead mb-0 opacity-90">
+                    <span
+                      th:text="${patient.id != null ? 'Mise à jour des informations médicales de ' + ${patient.name} : 'Création d\'un nouveau dossier médical dans le système hospitalier'}"
+                    >
+                      Saisie des informations médicales et personnelles
+                    </span>
+                  </p>
+                </div>
+                <div class="col-lg-4 text-end">
+                  <div class="btn-group" role="group">
+                    <a href="/user/index" class="btn btn-light btn-lg">
+                      <i class="bi bi-arrow-left-circle"></i>
+                      Retour Liste
+                    </a>
+                    <a
+                      href="/user/dashboard"
+                      class="btn btn-outline-light btn-lg"
+                    >
+                      <i class="bi bi-speedometer2"></i>
+                      Dashboard
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Medical Form -->
+            <section class="hospital-form-card card border-0 shadow-lg">
+              <div class="card-body p-0">
+                <form
+                  method="post"
+                  th:action="@{/admin/save}"
+                  th:object="${patient}"
+                  class="hospital-medical-form"
+                  novalidate
+                >
+                  <input type="hidden" th:field="*{id}" />
+
+                  <!-- Personal Information Section -->
+                  <div class="medical-form-section">
+                    <h6>
+                      <i class="bi bi-person-vcard me-2"></i>
+                      Informations Personnelles du Patient
+                    </h6>
+                    <div class="row g-3">
+                      <!-- Full Name -->
+                      <div class="col-lg-6">
+                        <div class="form-floating">
+                          <input
+                            type="text"
+                            class="form-control"
+                            th:field="*{name}"
+                            th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                            id="patientName"
+                            placeholder="Nom complet du patient"
+                            required
+                          />
+                          <label for="patientName">
+                            <i class="bi bi-person"></i> Nom Complet *
+                          </label>
+                          <div
+                            class="invalid-feedback"
+                            th:if="${#fields.hasErrors('name')}"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span th:errors="*{name}">Erreur nom</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Birth Date -->
+                      <div class="col-lg-6">
+                        <div class="form-floating">
+                          <input
+                            type="date"
+                            class="form-control"
+                            th:field="*{birthday}"
+                            th:class="${#fields.hasErrors('birthday')} ? 'form-control is-invalid' : 'form-control'"
+                            id="patientBirthday"
+                            required
+                          />
+                          <label for="patientBirthday">
+                            <i class="bi bi-calendar-heart"></i> Date de
+                            Naissance *
+                          </label>
+                          <div
+                            class="invalid-feedback"
+                            th:if="${#fields.hasErrors('birthday')}"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span th:errors="*{birthday}">Erreur date</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Email -->
+                      <div class="col-lg-6">
+                        <div class="form-floating">
+                          <input
+                            type="email"
+                            class="form-control"
+                            th:field="*{email}"
+                            th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'"
+                            id="patientEmail"
+                            placeholder="Email du patient"
+                            required
+                          />
+                          <label for="patientEmail">
+                            <i class="bi bi-envelope-at"></i> Adresse Email *
+                          </label>
+                          <div
+                            class="invalid-feedback"
+                            th:if="${#fields.hasErrors('email')}"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span th:errors="*{email}">Erreur email</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Phone -->
+                      <div class="col-lg-6">
+                        <div class="form-floating">
+                          <input
+                            type="tel"
+                            class="form-control"
+                            th:field="*{phone}"
+                            th:class="${#fields.hasErrors('phone')} ? 'form-control is-invalid' : 'form-control'"
+                            id="patientPhone"
+                            placeholder="Numéro de téléphone"
+                            pattern="^\\+?[0-9\\s\\-\\.\\(\\)]{8,20}$"
+                          />
+                          <label for="patientPhone">
+                            <i class="bi bi-telephone"></i> Numéro de Téléphone
+                          </label>
+                          <div
+                            class="invalid-feedback"
+                            th:if="${#fields.hasErrors('phone')}"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span th:errors="*{phone}">Erreur téléphone</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Medical Information Section -->
+                  <div class="medical-form-section">
+                    <h6>
+                      <i class="bi bi-heart-pulse me-2"></i>
+                      Informations Médicales et État de Santé
+                    </h6>
+                    <div class="row g-3">
+                      <!-- Health Status -->
+                      <div class="col-lg-6">
+                        <label class="form-label fw-semibold mb-3">
+                          <i class="bi bi-activity"></i> État de Santé Actuel *
+                        </label>
+                        <div class="health-status-toggle">
+                          <button
+                            type="button"
+                            class="health-status-option healthy"
+                            th:classappend="${!patient.isSick} ? ' active' : ''"
+                            onclick="setHealthStatus(false)"
+                          >
+                            <i class="bi bi-check-circle"></i>
+                            En Bonne Santé
+                          </button>
+                          <button
+                            type="button"
+                            class="health-status-option sick"
+                            th:classappend="${patient.isSick} ? ' active' : ''"
+                            onclick="setHealthStatus(true)"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Malade
+                          </button>
+                        </div>
+                        <input
+                          type="hidden"
+                          th:field="*{isSick}"
+                          id="healthStatusInput"
+                        />
+                      </div>
+
+                      <!-- Patient Status -->
+                      <div class="col-lg-6">
+                        <div class="form-floating">
+                          <select
+                            class="form-select"
+                            th:field="*{status}"
+                            id="patientStatus"
+                            required
+                          >
+                            <option value="">Choisir un statut</option>
+                            <option
+                              th:each="status : ${T(ma.enset.hopital.entities.Patient.PatientStatus).values()}"
+                              th:value="${status}"
+                              th:text="${status.displayName}"
+                              th:selected="${patient.status == status}"
+                            >
+                              Statut
+                            </option>
+                          </select>
+                          <label for="patientStatus">
+                            <i class="bi bi-clipboard2-pulse"></i> Statut
+                            Médical *
+                          </label>
+                        </div>
+                      </div>
+
+                      <!-- Health Score -->
+                      <div class="col-12">
+                        <label
+                          for="patientScore"
+                          class="form-label fw-semibold"
+                        >
+                          <i class="bi bi-graph-up"></i> Score de Santé
+                          <span
+                            class="badge bg-primary ms-2"
+                            id="scoreDisplay"
+                            th:text="${patient.score ?: '500'}"
+                            >500</span
+                          >
+                          /1000
+                        </label>
+                        <div class="mb-2">
+                          <input
+                            type="range"
+                            class="form-range health-score-slider"
+                            th:field="*{score}"
+                            id="patientScore"
+                            min="0"
+                            max="1000"
+                            step="10"
+                            oninput="updateScoreDisplay(this.value)"
+                          />
+                        </div>
+                        <div
+                          class="d-flex justify-content-between small text-muted"
+                        >
+                          <span
+                            ><i class="bi bi-emoji-frown text-danger"></i>
+                            Critique (0-300)</span
+                          >
+                          <span
+                            ><i class="bi bi-emoji-neutral text-warning"></i>
+                            Moyen (301-600)</span
+                          >
+                          <span
+                            ><i class="bi bi-emoji-smile text-success"></i> Bon
+                            (601-800)</span
+                          >
+                          <span
+                            ><i class="bi bi-emoji-laughing text-success"></i>
+                            Excellent (801-1000)</span
+                          >
+                        </div>
+                        <div
+                          class="invalid-feedback"
+                          th:if="${#fields.hasErrors('score')}"
+                        >
+                          <i class="bi bi-exclamation-triangle"></i>
+                          <span th:errors="*{score}">Erreur score</span>
+                        </div>
+                      </div>
+
+                      <!-- Medical Notes -->
+                      <div class="col-12">
+                        <div class="form-floating">
+                          <textarea
+                            class="form-control"
+                            th:field="*{notes}"
+                            id="patientNotes"
+                            style="height: 120px"
+                            placeholder="Notes médicales, observations, historique..."
+                          ></textarea>
+                          <label for="patientNotes">
+                            <i class="bi bi-file-medical"></i> Notes Médicales
+                            et Observations
+                          </label>
+                          <div class="form-text">
+                            <i class="bi bi-info-circle"></i>
+                            Saisissez ici les notes médicales, observations
+                            cliniques, historique des traitements, etc.
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            th:if="${#fields.hasErrors('notes')}"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <span th:errors="*{notes}">Erreur notes</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Patient Preview Section -->
+                  <div class="patient-preview" th:if="${patient.id != null}">
+                    <h6 class="text-primary mb-3">
+                      <i class="bi bi-eye me-2"></i>
+                      Aperçu du Patient
+                    </h6>
+                    <div class="row align-items-center">
+                      <div class="col-md-2 text-center">
+                        <div
+                          class="patient-avatar-letter mx-auto mb-2"
+                          style="width: 60px; height: 60px; font-size: 1.5rem"
+                          th:text="${patient.name != null ? patient.name.substring(0,1).toUpperCase() : 'P'}"
+                        >
+                          P
+                        </div>
+                      </div>
+                      <div class="col-md-10">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <strong>ID:</strong> #<span th:text="${patient.id}"
+                              >XXX</span
+                            ><br />
+                            <strong>Nom:</strong>
+                            <span th:text="${patient.name}">---</span><br />
+                            <strong>Email:</strong>
+                            <span th:text="${patient.email}">---</span>
+                          </div>
+                          <div class="col-md-6">
+                            <strong>Âge:</strong>
+                            <span th:text="${patient.age ?: '---'}">---</span>
+                            ans<br />
+                            <strong>Statut:</strong>
+                            <span th:text="${patient.statusDisplayName}"
+                              >---</span
+                            ><br />
+                            <strong>Score:</strong>
+                            <span th:text="${patient.score}">---</span>/1000
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Form Actions -->
+                  <div class="medical-actions">
+                    <div class="row align-items-center">
+                      <div class="col-md-8">
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="confirmData"
+                            required
+                          />
+                          <label class="form-check-label" for="confirmData">
+                            <i class="bi bi-shield-check"></i>
+                            Je confirme que les informations saisies sont
+                            exactes et complètes
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 text-end">
+                        <div class="btn-group" role="group">
+                          <a
+                            href="/user/index"
+                            class="btn btn-outline-secondary btn-lg"
+                          >
+                            <i class="bi bi-x-circle"></i>
+                            Annuler
+                          </a>
+                          <button type="submit" class="btn btn-success btn-lg">
+                            <i
+                              th:class="${patient.id != null ? 'bi bi-arrow-repeat' : 'bi bi-plus-circle'} + ' me-2'"
+                            ></i>
+                            <span
+                              th:text="${patient.id != null ? 'Mettre à Jour' : 'Créer Patient'}"
+                            >
+                              Enregistrer
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hospital Form JavaScript -->
+    <script>
+      // Health Status Toggle
+      function setHealthStatus(isSick) {
+        const healthInput = document.getElementById("healthStatusInput");
+        const healthButtons = document.querySelectorAll(
+          ".health-status-option"
+        );
+
+        healthInput.value = isSick;
+
+        healthButtons.forEach((btn) => btn.classList.remove("active"));
+        if (isSick) {
+          document
+            .querySelector(".health-status-option.sick")
+            .classList.add("active");
+        } else {
+          document
+            .querySelector(".health-status-option.healthy")
+            .classList.add("active");
+        }
+      }
+
+      // Score Display Update
+      function updateScoreDisplay(value) {
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        scoreDisplay.textContent = value;
+
+        // Update score display color based on value
+        scoreDisplay.className = "badge ms-2";
+        if (value >= 800) {
+          scoreDisplay.classList.add("bg-success");
+        } else if (value >= 600) {
+          scoreDisplay.classList.add("bg-info");
+        } else if (value >= 300) {
+          scoreDisplay.classList.add("bg-warning");
+        } else {
+          scoreDisplay.classList.add("bg-danger");
+        }
+      }
+
+      // Form Validation
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".hospital-medical-form");
+
+        form.addEventListener("submit", function (event) {
+          const confirmCheckbox = document.getElementById("confirmData");
+
+          if (!confirmCheckbox.checked) {
+            event.preventDefault();
+            alert(
+              "⚠️ Veuillez confirmer que les informations sont exactes avant de soumettre le formulaire."
+            );
+            return false;
+          }
+
+          // Add loading state
+          const submitBtn = form.querySelector('button[type="submit"]');
+          submitBtn.innerHTML =
+            '<i class="bi bi-hourglass-split me-2"></i>Enregistrement...';
+          submitBtn.disabled = true;
+        });
+
+        // Initialize score display
+        const scoreSlider = document.getElementById("patientScore");
+        if (scoreSlider) {
+          updateScoreDisplay(scoreSlider.value);
+        }
+      });
+    </script>
+  </body>
+</html>

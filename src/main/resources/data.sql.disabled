@@ -1,0 +1,6 @@
+-- This file has been disabled to prevent conflicts with programmatic data initialization
+-- The application now uses HopitalApplication.java for data generation
+
+-- Previous content moved to disabled state
+-- INSERT statements have been replaced with programmatic generation
+-- See HopitalApplication.java for comprehensive data initialization

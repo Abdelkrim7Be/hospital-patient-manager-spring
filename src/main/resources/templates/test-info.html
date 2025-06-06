@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html
+  lang="fr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔐 Test Info - Hospital System</title>
+  </head>
+
+  <body>
+    <div layout:fragment="content1">
+      <div class="container py-4">
+        <!-- Test Users Information -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                  <i class="bi bi-shield-lock"></i>
+                  Security Test Users
+                </h4>
+              </div>
+              <div class="card-body">
+                <div class="alert alert-info">
+                  <h5>Available Test Users (Password: <code>1234</code>)</h5>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <h6><i class="bi bi-person"></i> Regular Users:</h6>
+                      <ul class="list-unstyled">
+                        <li><code>user1</code> - ROLE_USER</li>
+                        <li><code>user2</code> - ROLE_USER</li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <h6><i class="bi bi-person-gear"></i> Administrator:</h6>
+                      <ul class="list-unstyled">
+                        <li><code>admin</code> - ROLE_USER, ROLE_ADMIN</li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <h6><i class="bi bi-key"></i> Permissions:</h6>
+                      <ul class="list-unstyled">
+                        <li>👁️ View patients: All users</li>
+                        <li>➕ Add patients: Admin only</li>
+                        <li>✏️ Edit patients: Admin only</li>
+                        <li>🗑️ Delete patients: Admin only</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current User Info -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                  <i class="bi bi-person-check"></i>
+                  Current Session Info
+                </h4>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h6>Authenticated User:</h6>
+                    <p class="badge bg-primary fs-6" sec:authentication="name">
+                      Anonymous
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6>User Roles:</h6>
+                    <p
+                      class="badge bg-secondary fs-6"
+                      sec:authentication="authorities"
+                    >
+                      No roles
+                    </p>
+                  </div>
+                </div>
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <h6>Access Rights:</h6>
+                    <div
+                      sec:authorize="hasRole('ADMIN')"
+                      class="alert alert-success"
+                    >
+                      ✅ <strong>Administrator Access</strong> - You can create,
+                      edit, and delete patients
+                    </div>
+                    <div
+                      sec:authorize="hasRole('USER') and !hasRole('ADMIN')"
+                      class="alert alert-warning"
+                    >
+                      👁️ <strong>User Access</strong> - You can view patients
+                      but cannot modify them
+                    </div>
+                    <div
+                      sec:authorize="!isAuthenticated()"
+                      class="alert alert-danger"
+                    >
+                      ❌ <strong>Not Authenticated</strong> - Please login to
+                      access the system
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Info -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                  <i class="bi bi-database"></i>
+                  Database Test Data Information
+                </h4>
+              </div>
+              <div class="card-body">
+                <div class="alert alert-success">
+                  <h5>✅ Initial Data Loaded Successfully!</h5>
+                  <p>
+                    The database has been populated with
+                    <strong>38 test patients</strong> covering various medical
+                    scenarios:
+                  </p>
+
+                  <div class="row">
+                    <div class="col-md-3">
+                      <h6>👨‍⚕️ Medical Staff (5)</h6>
+                      <small>Doctors and medical professionals</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>🚨 Emergency Cases (5)</h6>
+                      <small>Urgent medical conditions</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>👶 Pediatric (5)</h6>
+                      <small>Children and adolescents</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>👴 Geriatric (5)</h6>
+                      <small>Elderly patients</small>
+                    </div>
+                  </div>
+
+                  <div class="row mt-3">
+                    <div class="col-md-3">
+                      <h6>⏳ Chronic Conditions (5)</h6>
+                      <small>Long-term medical care</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>💪 Recovery (5)</h6>
+                      <small>Post-treatment recovery</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>📋 Various Statuses (8)</h6>
+                      <small>Active, Discharged, Inactive, Suspended</small>
+                    </div>
+                    <div class="col-md-3">
+                      <h6>🧪 Test Cases (3)</h6>
+                      <small>Edge cases and boundaries</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <h6>Quick Navigation:</h6>
+                  <div class="btn-group" role="group">
+                    <a href="/user/index" class="btn btn-primary">
+                      <i class="bi bi-people"></i> View All Patients
+                    </a>
+                    <a href="/user/dashboard" class="btn btn-info">
+                      <i class="bi bi-graph-up"></i> Dashboard
+                    </a>
+                    <a
+                      href="/h2-console"
+                      class="btn btn-secondary"
+                      target="_blank"
+                    >
+                      <i class="bi bi-database"></i> H2 Database Console
+                    </a>
+                    <div sec:authorize="hasRole('ADMIN')">
+                      <a href="/admin/formPatients" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i> Add New Patient
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">
+                  <i class="bi bi-gear"></i>
+                  System Status
+                </h4>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="bi bi-check-circle-fill text-success fs-4 me-2"
+                      ></i>
+                      <div>
+                        <h6 class="mb-0">Spring Security</h6>
+                        <small class="text-muted"
+                          >Authentication & Authorization Active</small
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="bi bi-check-circle-fill text-success fs-4 me-2"
+                      ></i>
+                      <div>
+                        <h6 class="mb-0">H2 Database</h6>
+                        <small class="text-muted"
+                          >In-Memory Database Running</small
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="bi bi-check-circle-fill text-success fs-4 me-2"
+                      ></i>
+                      <div>
+                        <h6 class="mb-0">Thymeleaf Templates</h6>
+                        <small class="text-muted">Hospital Theme Active</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

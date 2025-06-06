@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title>Détails Patient</title>
+  </head>
+  <body>
+    <div layout:fragment="content1">
+      <div class="container p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>
+            <i class="bi bi-person-lines-fill text-black"></i>
+            Profil Patient
+          </h2>
+          <div>
+            <a href="/user/index" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+            <a
+              th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+              th:href="@{/admin/editPatients(id=${patient.id})}"
+              class="btn btn-primary"
+            >
+              <i class="bi bi-pencil"></i> Modifier
+            </a>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Patient Information Card -->
+          <div class="col-lg-8">
+            <div class="card shadow mb-4">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                  <i class="bi bi-person-fill"></i>
+                  <span th:text="${patient.name}">Nom du Patient</span>
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h6 class="text-black">Informations Personnelles</h6>
+                    <table class="table table-borderless">
+                      <tr>
+                        <td>
+                          <strong><i class="bi bi-hash"></i> ID:</strong>
+                        </td>
+                        <td>
+                          <span
+                            class="badge bg-secondary"
+                            th:text="${patient.id}"
+                          ></span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong><i class="bi bi-person"></i> Nom:</strong>
+                        </td>
+                        <td th:text="${patient.name}"></td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-calendar"></i> Date de
+                            naissance:</strong
+                          >
+                        </td>
+                        <td
+                          th:text="${#dates.format(patient.birthday, 'dd/MM/yyyy')}"
+                        ></td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong><i class="bi bi-clock"></i> Âge:</strong>
+                        </td>
+                        <td><span th:text="${patient.age}"></span> ans</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong><i class="bi bi-envelope"></i> Email:</strong>
+                        </td>
+                        <td>
+                          <a
+                            th:href="'mailto:' + ${patient.email}"
+                            th:text="${patient.email}"
+                            class="text-decoration-none"
+                          ></a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-telephone"></i> Téléphone:</strong
+                          >
+                        </td>
+                        <td th:text="${patient.phone}"></td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <div class="col-md-6">
+                    <h6 class="text-black">Informations Médicales</h6>
+                    <table class="table table-borderless">
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-activity"></i> État de
+                            santé:</strong
+                          >
+                        </td>
+                        <td>
+                          <span
+                            th:if="${patient.isSick}"
+                            class="badge bg-danger"
+                          >
+                            <i class="bi bi-exclamation-triangle"></i> Malade
+                          </span>
+                          <span
+                            th:unless="${patient.isSick}"
+                            class="badge bg-success"
+                          >
+                            <i class="bi bi-check-circle"></i> En bonne santé
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-bar-chart"></i> Score:</strong
+                          >
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div
+                              class="progress me-2"
+                              style="width: 100px; height: 10px"
+                            >
+                              <div
+                                class="progress-bar"
+                                th:classappend="${patient.score >= 700} ? 'bg-success' : (${patient.score >= 400} ? 'bg-warning' : 'bg-danger')"
+                                role="progressbar"
+                                th:style="'width: ' + ${patient.score / 10} + '%'"
+                                th:aria-valuenow="${patient.score}"
+                                aria-valuemin="0"
+                                aria-valuemax="1000"
+                              ></div>
+                            </div>
+                            <strong
+                              th:text="${patient.score} + '/1000'"
+                            ></strong>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong><i class="bi bi-flag"></i> Statut:</strong>
+                        </td>
+                        <td>
+                          <span
+                            class="badge"
+                            th:classappend="${patient.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                               (${patient.status.name() == 'INACTIVE'} ? 'bg-secondary' :
+                                               (${patient.status.name() == 'DISCHARGED'} ? 'bg-info' : 'bg-warning'))"
+                            th:text="${patient.statusDisplayName}"
+                          >
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-calendar-plus"></i> Créé
+                            le:</strong
+                          >
+                        </td>
+                        <td
+                          th:text="${#dates.format(patient.createdAt, 'dd/MM/yyyy HH:mm')}"
+                        ></td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <strong
+                            ><i class="bi bi-calendar-check"></i> Modifié
+                            le:</strong
+                          >
+                        </td>
+                        <td
+                          th:text="${#dates.format(patient.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                        ></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div
+                  class="row mt-3"
+                  th:if="${patient.notes != null and !#strings.isEmpty(patient.notes)}"
+                >
+                  <div class="col-12">
+                    <h6 class="text-black">
+                      <i class="bi bi-journal-text"></i> Notes Médicales
+                    </h6>
+                    <div class="alert alert-info">
+                      <p th:text="${patient.notes}" class="mb-0"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Sidebar -->
+          <div class="col-lg-4">
+            <div class="card shadow mb-4">
+              <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">
+                  <i class="bi bi-lightning"></i> Actions Rapides
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="d-grid gap-2">
+                  <a
+                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                    th:href="@{/admin/editPatients(id=${patient.id})}"
+                    class="btn btn-primary"
+                  >
+                    <i class="bi bi-pencil"></i> Modifier les informations
+                  </a>
+
+                  <button
+                    type="button"
+                    class="btn btn-outline-info"
+                    data-bs-toggle="modal"
+                    data-bs-target="#contactModal"
+                  >
+                    <i class="bi bi-envelope"></i> Contacter le patient
+                  </button>
+
+                  <a href="/user/index" class="btn btn-outline-secondary">
+                    <i class="bi bi-list"></i> Voir tous les patients
+                  </a>
+
+                  <a href="/user/dashboard" class="btn btn-outline-info">
+                    <i class="bi bi-graph-up"></i> Dashboard
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Health Score Card -->
+            <div class="card shadow">
+              <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                  <i class="bi bi-heart-pulse"></i> Évaluation Santé
+                </h6>
+              </div>
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <div
+                    class="display-4 text-black"
+                    th:text="${patient.score}"
+                  ></div>
+                  <small class="text-muted">/ 1000</small>
+                </div>
+
+                <div class="progress mb-3" style="height: 15px">
+                  <div
+                    class="progress-bar"
+                    th:classappend="${patient.score >= 700} ? 'bg-success' : (${patient.score >= 400} ? 'bg-warning' : 'bg-danger')"
+                    role="progressbar"
+                    th:style="'width: ' + ${patient.score / 10} + '%'"
+                    th:aria-valuenow="${patient.score}"
+                    aria-valuemin="0"
+                    aria-valuemax="1000"
+                  ></div>
+                </div>
+
+                <p class="mb-0">
+                  <span th:if="${patient.score >= 700}" class="text-black">
+                    <i class="bi bi-check-circle"></i> Excellent état de santé
+                  </span>
+                  <span
+                    th:if="${patient.score >= 400 and patient.score < 700}"
+                    class="text-black"
+                  >
+                    <i class="bi bi-exclamation-triangle"></i> État de santé
+                    moyen
+                  </span>
+                  <span th:if="${patient.score < 400}" class="text-black">
+                    <i class="bi bi-x-circle"></i> État de santé préoccupant
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Modal -->
+        <div class="modal fade" id="contactModal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <i class="bi bi-envelope"></i> Contacter
+                  <span th:text="${patient.name}"></span>
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="d-grid gap-2">
+                  <a
+                    th:href="'mailto:' + ${patient.email}"
+                    class="btn btn-primary"
+                  >
+                    <i class="bi bi-envelope"></i> Envoyer un email
+                  </a>
+                  <a
+                    th:href="'tel:' + ${patient.phone}"
+                    class="btn btn-success"
+                  >
+                    <i class="bi bi-telephone"></i> Appeler
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

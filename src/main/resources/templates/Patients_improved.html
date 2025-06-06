@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html
+  lang="fr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Gestion des Patients - Système Hospitalier ENSET"
+    />
+    <meta
+      name="keywords"
+      content="patients, hôpital, dossiers médicaux, santé, ENSET"
+    />
+    <meta name="author" content="Système Hospitalier ENSET" />
+
+    <!-- Hospital-specific CSS -->
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="/css/black-white-theme.css" />
+
+    <title>🏥 Gestion des Patients - Système Hospitalier ENSET</title>
+
+    <!-- Hospital Patient Management Styles -->
+    <style>
+      .hospital-patient-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        color: white;
+        border-radius: 1rem 1rem 0 0;
+        padding: 2rem;
+        margin-bottom: 0;
+      }
+
+      .patient-stats-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .medical-alert {
+        border-left: 4px solid;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+      }
+
+      .medical-alert.success {
+        border-left-color: #198754;
+      }
+
+      .medical-alert.error {
+        border-left-color: #dc3545;
+      }
+
+      .patient-row {
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+      }
+
+      .patient-row:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .health-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+      }
+
+      .health-indicator.healthy {
+        background-color: #198754;
+        box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
+      }
+
+      .health-indicator.sick {
+        background-color: #dc3545;
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+      }
+
+      .score-indicator {
+        width: 100%;
+        max-width: 80px;
+        height: 6px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .score-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+
+      .patient-avatar-letter {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      .action-btn-group .btn {
+        margin: 0 2px;
+        border-radius: 0.375rem;
+      }
+
+      .table th {
+        background-color: #212529;
+        color: white;
+        font-weight: 600;
+        border: none;
+        padding: 1rem 0.75rem;
+      }
+
+      .pagination-hospital .page-link {
+        border-radius: 0.5rem;
+        margin: 0 2px;
+        border: none;
+        background-color: #f8f9fa;
+        color: #0d6efd;
+      }
+
+      .pagination-hospital .page-link:hover,
+      .pagination-hospital .page-link.active {
+        background-color: #0d6efd;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Main Patient Management Content -->
+    <div layout:fragment="content1">
+      <div class="container-fluid py-3">
+        <!-- Hospital Patient Management Header -->
+        <section class="hospital-patient-header shadow-lg mb-4">
+          <div class="row align-items-center">
+            <div class="col-lg-8">
+              <h1 class="display-5 fw-bold mb-2">
+                <i class="bi bi-people-fill me-3"></i>
+                Gestion des Patients
+              </h1>
+              <p class="lead mb-0 opacity-90">
+                Système de gestion des dossiers médicaux et informations
+                patients - Hôpital ENSET
+              </p>
+            </div>
+            <div class="col-lg-4">
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="patient-stats-card">
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                    >
+                      <i class="bi bi-people fs-3 me-2"></i>
+                      <div>
+                        <h3 class="mb-0" th:text="${totalElements}">0</h3>
+                        <small class="opacity-75">Total Patients</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="patient-stats-card">
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                    >
+                      <i class="bi bi-heart-pulse fs-3 me-2"></i>
+                      <div>
+                        <h3 class="mb-0" th:text="${#lists.size(patients)}">
+                          0
+                        </h3>
+                        <small class="opacity-75">Sur cette page</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Medical Alert System -->
+        <section
+          class="medical-alerts mb-4"
+          th:if="${successMessage or errorMessage}"
+        >
+          <!-- Success Medical Notification -->
+          <div
+            th:if="${successMessage}"
+            class="alert medical-alert success alert-dismissible fade show shadow-sm"
+            role="alert"
+          >
+            <div class="d-flex align-items-start">
+              <div class="flex-shrink-0">
+                <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <h6 class="alert-heading fw-bold mb-1 text-success">
+                  ✅ Opération Médicale Réussie
+                </h6>
+                <p class="mb-0" th:text="${successMessage}">
+                  Message de succès
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Error Medical Notification -->
+          <div
+            th:if="${errorMessage}"
+            class="alert medical-alert error alert-dismissible fade show shadow-sm"
+            role="alert"
+          >
+            <div class="d-flex align-items-start">
+              <div class="flex-shrink-0">
+                <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <h6 class="alert-heading fw-bold mb-1 text-danger">
+                  ⚠️ Erreur dans le Système Médical
+                </h6>
+                <p class="mb-0" th:text="${errorMessage}">Message d'erreur</p>
+              </div>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hospital Search & Management Tools -->
+        <section class="hospital-tools card border-0 shadow-sm mb-4">
+          <div class="card-header bg-gradient bg-dark text-white">
+            <div class="row align-items-center">
+              <div class="col">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-search me-2"></i>
+                  Recherche et Gestion des Patients
+                </h5>
+              </div>
+              <div class="col-auto">
+                <a
+                  th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                  href="/admin/formPatients"
+                  class="btn btn-success btn-sm"
+                >
+                  <i class="bi bi-plus-circle-fill me-1"></i>
+                  Nouveau Patient
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <form
+              method="get"
+              th:action="@{/user/index}"
+              class="hospital-search-form"
+            >
+              <div class="row g-3">
+                <!-- Patient Search -->
+                <div class="col-lg-5">
+                  <label for="patientKeyword" class="form-label fw-semibold">
+                    <i class="bi bi-person-search text-primary"></i>
+                    Recherche Patient
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                      type="text"
+                      id="patientKeyword"
+                      name="keyword"
+                      class="form-control"
+                      th:value="${keyword}"
+                      placeholder="Nom, prénom, email du patient..."
+                    />
+                    <button class="btn btn-primary" type="submit">
+                      <i class="bi bi-search"></i>
+                      Rechercher
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sort Method -->
+                <div class="col-lg-3">
+                  <label for="sortBy" class="form-label fw-semibold">
+                    <i class="bi bi-sort-alpha-down text-info"></i>
+                    Trier par
+                  </label>
+                  <select
+                    id="sortBy"
+                    name="sortBy"
+                    class="form-select"
+                    th:value="${sortBy}"
+                  >
+                    <option value="id" th:selected="${sortBy == 'id'}">
+                      🆔 ID Patient
+                    </option>
+                    <option value="name" th:selected="${sortBy == 'name'}">
+                      👤 Nom Complet
+                    </option>
+                    <option
+                      value="birthday"
+                      th:selected="${sortBy == 'birthday'}"
+                    >
+                      🎂 Âge (Date Naissance)
+                    </option>
+                    <option value="score" th:selected="${sortBy == 'score'}">
+                      📊 Score de Santé
+                    </option>
+                    <option value="status" th:selected="${sortBy == 'status'}">
+                      📋 Statut Médical
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Sort Direction -->
+                <div class="col-lg-2">
+                  <label for="sortDir" class="form-label fw-semibold">
+                    <i class="bi bi-arrow-up-down text-warning"></i>
+                    Ordre
+                  </label>
+                  <select
+                    id="sortDir"
+                    name="sortDir"
+                    class="form-select"
+                    th:value="${sortDir}"
+                  >
+                    <option value="asc" th:selected="${sortDir == 'asc'}">
+                      ⬆️ Croissant
+                    </option>
+                    <option value="desc" th:selected="${sortDir == 'desc'}">
+                      ⬇️ Décroissant
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Advanced Tools -->
+                <div class="col-lg-2">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-tools text-secondary"></i>
+                    Outils Avancés
+                  </label>
+                  <div class="d-grid">
+                    <a href="/user/search" class="btn btn-outline-secondary">
+                      <i class="bi bi-funnel-fill"></i>
+                      Filtres Avancés
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Search Results Summary -->
+              <div class="row mt-3">
+                <div class="col">
+                  <div
+                    class="d-flex justify-content-between align-items-center p-3 bg-light rounded"
+                  >
+                    <span class="text-muted">
+                      <i class="bi bi-info-circle-fill text-primary"></i>
+                      <strong th:text="${totalElements}">0</strong> patient(s)
+                      trouvé(s)
+                      <span
+                        th:if="${keyword and !keyword.isEmpty()}"
+                        class="ms-2"
+                      >
+                        pour "<em th:text="${keyword}"></em>"
+                      </span>
+                    </span>
+                    <div class="btn-group btn-group-sm">
+                      <a href="/user/dashboard" class="btn btn-outline-info">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                      </a>
+                      <a href="/user/search" class="btn btn-outline-secondary">
+                        <i class="bi bi-funnel"></i> Recherche Avancée
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Hospital Patients Table -->
+        <section class="hospital-patients-table card border-0 shadow-lg">
+          <div class="card-header bg-gradient bg-primary text-white">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-table me-2"></i>
+              Liste des Patients Hospitalisés
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col"><i class="bi bi-hash"></i> ID</th>
+                    <th scope="col">
+                      <i class="bi bi-person-badge"></i> Patient
+                    </th>
+                    <th scope="col">
+                      <i class="bi bi-calendar-heart"></i> Âge
+                    </th>
+                    <th scope="col">
+                      <i class="bi bi-envelope-at"></i> Contact
+                    </th>
+                    <th scope="col">
+                      <i class="bi bi-heart-pulse"></i> État de Santé
+                    </th>
+                    <th scope="col"><i class="bi bi-graph-up"></i> Score</th>
+                    <th scope="col">
+                      <i class="bi bi-clipboard2-pulse"></i> Statut
+                    </th>
+                    <th scope="col"><i class="bi bi-gear"></i> Actions</th>
+                    <th
+                      scope="col"
+                      th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                    >
+                      <i class="bi bi-shield-lock"></i> Admin
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    th:each="patient : ${patients}"
+                    class="patient-row"
+                    th:classappend="${patient.isSick} ? 'table-warning' : ''"
+                  >
+                    <!-- Patient ID -->
+                    <td>
+                      <span
+                        class="badge bg-secondary fs-6"
+                        th:text="${patient.id}"
+                        >001</span
+                      >
+                    </td>
+
+                    <!-- Patient Info -->
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="patient-avatar-letter me-3"
+                          th:text="${patient.name.substring(0,1).toUpperCase()}"
+                        >
+                          J
+                        </div>
+                        <div>
+                          <div class="fw-bold" th:text="${patient.name}">
+                            John Doe
+                          </div>
+                          <small class="text-muted">
+                            <i class="bi bi-telephone"></i>
+                            <span th:text="${patient.phone}"
+                              >+212-XXX-XXXX</span
+                            >
+                          </small>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Age Info -->
+                    <td>
+                      <div
+                        class="fw-semibold"
+                        th:text="${patient.age} + ' ans'"
+                      >
+                        25 ans
+                      </div>
+                      <small
+                        class="text-muted"
+                        th:text="${#dates.format(patient.birthday, 'dd/MM/yyyy')}"
+                      >
+                        01/01/1998
+                      </small>
+                    </td>
+
+                    <!-- Contact Info -->
+                    <td>
+                      <a
+                        th:href="'mailto:' + ${patient.email}"
+                        class="text-decoration-none text-primary"
+                        th:text="${patient.email}"
+                      >
+                        john.doe@email.com
+                      </a>
+                    </td>
+
+                    <!-- Health Status -->
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span
+                          th:if="${patient.isSick}"
+                          class="health-indicator sick"
+                        ></span>
+                        <span
+                          th:unless="${patient.isSick}"
+                          class="health-indicator healthy"
+                        ></span>
+
+                        <span th:if="${patient.isSick}" class="badge bg-danger">
+                          <i class="bi bi-exclamation-triangle"></i>
+                          Malade
+                        </span>
+                        <span
+                          th:unless="${patient.isSick}"
+                          class="badge bg-success"
+                        >
+                          <i class="bi bi-check-circle"></i>
+                          Bonne Santé
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Health Score -->
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="score-indicator me-2">
+                          <div
+                            class="score-bar"
+                            th:classappend="${patient.score >= 700} ? 'bg-success' : (${patient.score >= 400} ? 'bg-warning' : 'bg-danger')"
+                            th:style="'width: ' + ${patient.score / 10} + '%'"
+                          ></div>
+                        </div>
+                        <small
+                          class="fw-bold"
+                          th:text="${patient.score} + '/1000'"
+                          >750/1000</small
+                        >
+                      </div>
+                    </td>
+
+                    <!-- Medical Status -->
+                    <td>
+                      <span
+                        class="badge fs-6"
+                        th:classappend="${patient.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                                             (${patient.status.name() == 'INACTIVE'} ? 'bg-secondary' :
+                                                             (${patient.status.name() == 'DISCHARGED'} ? 'bg-info' : 'bg-warning'))"
+                        th:text="${patient.statusDisplayName}"
+                      >
+                        Actif
+                      </span>
+                    </td>
+
+                    <!-- Patient Actions -->
+                    <td>
+                      <div class="action-btn-group">
+                        <button
+                          class="btn btn-outline-primary btn-sm"
+                          data-bs-toggle="modal"
+                          th:data-bs-target="'#patientModal' + ${patient.id}"
+                          title="Voir détails médicaux"
+                        >
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <a
+                          th:href="@{/user/patient/{id}(id=${patient.id})}"
+                          class="btn btn-outline-info btn-sm"
+                          title="Dossier médical complet"
+                        >
+                          <i class="bi bi-file-medical"></i>
+                        </a>
+                      </div>
+                    </td>
+
+                    <!-- Admin Actions -->
+                    <td
+                      th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                    >
+                      <div class="action-btn-group">
+                        <a
+                          th:href="@{/admin/editPatients(id=${patient.id}, keyword=${keyword}, page=${currentPage})}"
+                          class="btn btn-outline-success btn-sm"
+                          title="Modifier le patient"
+                        >
+                          <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a
+                          th:href="@{/deletePatient(id=${patient.id}, keyword=${keyword}, page=${currentPage})}"
+                          class="btn btn-outline-danger btn-sm"
+                          onclick="return confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce patient du système hospitalier ?')"
+                          title="Supprimer le patient"
+                        >
+                          <i class="bi bi-trash3"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Hospital Pagination -->
+          <div class="card-footer bg-light">
+            <nav aria-label="Pages des patients">
+              <ul
+                class="pagination pagination-hospital justify-content-center mb-0"
+              >
+                <li th:each="page,status : ${pages}" class="page-item">
+                  <a
+                    class="page-link"
+                    th:classappend="${currentPage == status.index} ? 'active' : ''"
+                    th:href="@{/user/index(page=${status.index}, keyword=${keyword}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                    th:text="${status.index + 1}"
+                  >
+                    1
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+
+      <!-- Patient Medical Details Modals -->
+      <div
+        th:each="patient : ${patients}"
+        th:id="'patientModal' + ${patient.id}"
+        class="modal fade"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">
+                <i class="bi bi-file-medical-fill me-2"></i>
+                Dossier Médical - <span th:text="${patient.name}">Patient</span>
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-4 text-center">
+                  <div
+                    class="patient-avatar-letter mx-auto mb-3"
+                    style="width: 80px; height: 80px; font-size: 2rem"
+                    th:text="${patient.name.substring(0,1).toUpperCase()}"
+                  >
+                    J
+                  </div>
+                  <h4 th:text="${patient.name}">Patient Name</h4>
+                  <p class="text-muted" th:text="'Patient #' + ${patient.id}">
+                    Patient #001
+                  </p>
+                </div>
+                <div class="col-md-8">
+                  <h6 class="border-bottom pb-2 mb-3">
+                    📋 Informations Médicales
+                  </h6>
+                  <dl class="row">
+                    <dt class="col-sm-4">🆔 ID Patient:</dt>
+                    <dd class="col-sm-8" th:text="${patient.id}">001</dd>
+
+                    <dt class="col-sm-4">🎂 Date de Naissance:</dt>
+                    <dd
+                      class="col-sm-8"
+                      th:text="${#dates.format(patient.birthday, 'dd MMMM yyyy')}"
+                    >
+                      01 Janvier 1998
+                    </dd>
+
+                    <dt class="col-sm-4">📧 Email:</dt>
+                    <dd class="col-sm-8">
+                      <a
+                        th:href="'mailto:' + ${patient.email}"
+                        th:text="${patient.email}"
+                        >email@example.com</a
+                      >
+                    </dd>
+
+                    <dt class="col-sm-4">📞 Téléphone:</dt>
+                    <dd class="col-sm-8" th:text="${patient.phone}">
+                      +212-XXX-XXXX
+                    </dd>
+
+                    <dt class="col-sm-4">🏥 État de Santé:</dt>
+                    <dd class="col-sm-8">
+                      <span
+                        th:if="${patient.isSick}"
+                        class="badge bg-danger fs-6"
+                      >
+                        <i class="bi bi-exclamation-triangle"></i> Malade
+                      </span>
+                      <span
+                        th:unless="${patient.isSick}"
+                        class="badge bg-success fs-6"
+                      >
+                        <i class="bi bi-check-circle"></i> En Bonne Santé
+                      </span>
+                    </dd>
+
+                    <dt class="col-sm-4">📊 Score de Santé:</dt>
+                    <dd class="col-sm-8">
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="progress me-2"
+                          style="width: 100px; height: 20px"
+                        >
+                          <div
+                            class="progress-bar"
+                            th:classappend="${patient.score >= 700} ? 'bg-success' : (${patient.score >= 400} ? 'bg-warning' : 'bg-danger')"
+                            th:style="'width: ' + ${patient.score / 10} + '%'"
+                            th:text="${patient.score} + '/1000'"
+                          >
+                            750/1000
+                          </div>
+                        </div>
+                        <span class="fw-bold" th:text="${patient.scoreCategory}"
+                          >Excellent</span
+                        >
+                      </div>
+                    </dd>
+
+                    <dt class="col-sm-4">📋 Statut Médical:</dt>
+                    <dd class="col-sm-8">
+                      <span
+                        class="badge fs-6"
+                        th:classappend="${patient.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                                             (${patient.status.name() == 'INACTIVE'} ? 'bg-secondary' :
+                                                             (${patient.status.name() == 'DISCHARGED'} ? 'bg-info' : 'bg-warning'))"
+                        th:text="${patient.statusDisplayName}"
+                      >
+                        Actif
+                      </span>
+                    </dd>
+
+                    <dt class="col-sm-4">📝 Notes Médicales:</dt>
+                    <dd class="col-sm-8">
+                      <div
+                        class="bg-light p-2 rounded"
+                        th:text="${patient.notes ?: 'Aucune note médicale disponible'}"
+                      >
+                        Notes du médecin...
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                <i class="bi bi-x-circle"></i> Fermer
+              </button>
+              <a
+                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                th:href="@{/admin/editPatients(id=${patient.id}, keyword=${keyword}, page=${currentPage})}"
+                class="btn btn-success"
+              >
+                <i class="bi bi-pencil-square"></i> Modifier
+              </a>
+              <a
+                th:href="@{/user/patient/{id}(id=${patient.id})}"
+                class="btn btn-primary"
+              >
+                <i class="bi bi-file-medical"></i> Dossier Complet
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="template1">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Formulaire Patient - Système Hospitalier ENSET" />
+    <meta name="keywords" content="patient, formulaire, hôpital, dossier médical, ENSET" />
+    
+    <!-- Hospital Form CSS -->
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/css/black-white-theme.css" />
+    
+    <title th:text="${patient.id != null ? '✏️ Modifier Patient - ' + ${patient.name} : '➕ Nouveau Patient'} + ' - Système Hospitalier'">
+        📝 Formulaire Patient - Système Hospitalier ENSET
+    </title>
+    
+    <!-- Hospital Form Styles -->
+    <style>
+        .hospital-form-header {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            padding: 2rem;
+        }
+        
+        .medical-form-section {
+            background: #f8f9fa;
+            border-left: 4px solid #0d6efd;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        
+        .medical-form-section h6 {
+            color: #0d6efd;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .invalid-feedback {
+            display: block;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .health-score-slider {
+            background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #198754 100%);
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .health-status-toggle {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 2rem;
+            padding: 0.25rem;
+        }
+        
+        .health-status-option {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 1.5rem;
+            border: none;
+            background: transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .health-status-option.active.healthy {
+            background: #198754;
+            color: white;
+        }
+        
+        .health-status-option.active.sick {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .patient-preview {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #dee2e6;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .medical-actions {
+            background: #ffffff;
+            border-top: 3px solid #0d6efd;
+            padding: 1.5rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+        
+        .form-floating label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .form-floating .form-control:focus ~ label,
+        .form-floating .form-control:not(:placeholder-shown) ~ label {
+            color: #0d6efd;
+            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+    </style>
+</head>
+  <body>
+    <div layout:fragment="content1">
+      <div class="container p-4">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="card shadow">
+              <div
+                class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+              >
+                <h4 class="mb-0">
+                  <i class="bi bi-person-plus"></i>
+                  <span
+                    th:text="${patient.id != null ? 'Modifier Patient' : 'Nouveau Patient'}"
+                    >Formulaire Patient</span
+                  >
+                </h4>
+                <a href="/user/index" class="btn btn-light btn-sm">
+                  <i class="bi bi-arrow-left"></i> Retour
+                </a>
+              </div>
+              <div class="card-body">
+                <form
+                  method="post"
+                  th:action="@{/admin/save}"
+                  th:object="${patient}"
+                  novalidate
+                >
+                  <input type="hidden" th:field="*{id}" />
+
+                  <div class="row">
+                    <!-- Personal Information -->
+                    <div class="col-md-6">
+                      <h5 class="text-black mb-3">
+                        <i class="bi bi-person"></i> Informations Personnelles
+                      </h5>
+
+                      <div class="mb-3">
+                        <label for="name" class="form-label">
+                          <i class="bi bi-person-fill"></i> Nom Complet *
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                          id="name"
+                          th:field="*{name}"
+                          placeholder="Entrez le nom complet"
+                          required
+                        />
+                        <div class="invalid-feedback" th:errors="*{name}"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="birthday" class="form-label">
+                          <i class="bi bi-calendar"></i> Date de Naissance *
+                        </label>
+                        <input
+                          type="date"
+                          class="form-control"
+                          th:class="${#fields.hasErrors('birthday')} ? 'form-control is-invalid' : 'form-control'"
+                          id="birthday"
+                          th:field="*{birthday}"
+                          required
+                        />
+                        <div
+                          class="invalid-feedback"
+                          th:errors="*{birthday}"
+                        ></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="email" class="form-label">
+                          <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input
+                          type="email"
+                          class="form-control"
+                          th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'"
+                          id="email"
+                          th:field="*{email}"
+                          placeholder="exemple@email.com"
+                        />
+                        <div
+                          class="invalid-feedback"
+                          th:errors="*{email}"
+                        ></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="phone" class="form-label">
+                          <i class="bi bi-telephone"></i> Téléphone
+                        </label>
+                        <input
+                          type="tel"
+                          class="form-control"
+                          th:class="${#fields.hasErrors('phone')} ? 'form-control is-invalid' : 'form-control'"
+                          id="phone"
+                          th:field="*{phone}"
+                          placeholder="+212612345678"
+                        />
+                        <div
+                          class="invalid-feedback"
+                          th:errors="*{phone}"
+                        ></div>
+                      </div>
+                    </div>
+
+                    <!-- Medical Information -->
+                    <div class="col-md-6">
+                      <h5 class="text-black mb-3">
+                        <i class="bi bi-heart-pulse"></i> Informations Médicales
+                      </h5>
+
+                      <div class="mb-3">
+                        <label class="form-label">
+                          <i class="bi bi-activity"></i> État de Santé
+                        </label>
+                        <div class="form-check form-switch">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="isSick"
+                            th:field="*{isSick}"
+                          />
+                          <label class="form-check-label" for="isSick">
+                            Patient malade
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="score" class="form-label">
+                          <i class="bi bi-bar-chart"></i> Score de Santé *
+                        </label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          th:class="${#fields.hasErrors('score')} ? 'form-control is-invalid' : 'form-control'"
+                          id="score"
+                          th:field="*{score}"
+                          min="0"
+                          max="1000"
+                          placeholder="0-1000"
+                          required
+                        />
+                        <div class="form-text">Score entre 0 et 1000</div>
+                        <div
+                          class="invalid-feedback"
+                          th:errors="*{score}"
+                        ></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="status" class="form-label">
+                          <i class="bi bi-flag"></i> Statut
+                        </label>
+                        <select
+                          class="form-select"
+                          id="status"
+                          th:field="*{status}"
+                        >
+                          <option
+                            th:each="status : ${statuses}"
+                            th:value="${status}"
+                            th:text="${status.displayName}"
+                            th:selected="${status == patient.status}"
+                          ></option>
+                        </select>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="notes" class="form-label">
+                          <i class="bi bi-journal-text"></i> Notes
+                        </label>
+                        <textarea
+                          class="form-control"
+                          th:class="${#fields.hasErrors('notes')} ? 'form-control is-invalid' : 'form-control'"
+                          id="notes"
+                          th:field="*{notes}"
+                          rows="3"
+                          placeholder="Notes médicales ou observations..."
+                        ></textarea>
+                        <div
+                          class="invalid-feedback"
+                          th:errors="*{notes}"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr />
+
+                  <div class="d-flex justify-content-between">
+                    <a href="/user/index" class="btn btn-secondary">
+                      <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-check-circle"></i>
+                      <span
+                        th:text="${patient.id != null ? 'Modifier' : 'Enregistrer'}"
+                        >Enregistrer</span
+                      >
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

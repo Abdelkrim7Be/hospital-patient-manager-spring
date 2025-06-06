@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title>Dashboard - Hôpital</title>
+  </head>
+  <body>
+    <div layout:fragment="content1">
+      <div class="container-fluid p-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>
+            <i class="bi bi-graph-up text-primary"></i> Dashboard des Patients
+          </h2>
+          <a href="/user/index" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+          </a>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div
+                      class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                    >
+                      Total Patients
+                    </div>
+                    <div
+                      class="h5 mb-0 font-weight-bold text-gray-800"
+                      th:text="${totalPatients}"
+                    >
+                      0
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-people-fill fa-2x text-primary"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div
+                      class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                    >
+                      Patients en Bonne Santé
+                    </div>
+                    <div
+                      class="h5 mb-0 font-weight-bold text-gray-800"
+                      th:text="${healthyPatients}"
+                    >
+                      0
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-heart-fill fa-2x text-success"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div
+                      class="text-xs font-weight-bold text-warning text-uppercase mb-1"
+                    >
+                      Patients Malades
+                    </div>
+                    <div
+                      class="h5 mb-0 font-weight-bold text-gray-800"
+                      th:text="${sickPatients}"
+                    >
+                      0
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i
+                      class="bi bi-exclamation-triangle-fill fa-2x text-warning"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+              <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                  <div class="col mr-2">
+                    <div
+                      class="text-xs font-weight-bold text-info text-uppercase mb-1"
+                    >
+                      Score Moyen
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                      <span
+                        th:text="${averageScore != null ? #numbers.formatDecimal(averageScore, 1, 1) : '0.0'}"
+                        >0.0</span
+                      >
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-bar-chart-fill fa-2x text-info"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row">
+          <!-- Health Status Chart -->
+          <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+              <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+              >
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Répartition par État de Santé
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                  <canvas id="healthChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                  <span class="mr-2">
+                    <i class="bi bi-circle-fill text-success"></i> En bonne
+                    santé
+                  </span>
+                  <span class="mr-2">
+                    <i class="bi bi-circle-fill text-danger"></i> Malades
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Distribution Chart -->
+          <div class="col-xl-6 col-lg-6">
+            <div class="card shadow mb-4">
+              <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+              >
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Répartition par Statut
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-bar">
+                  <canvas id="statusChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Table -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Détails par Statut
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Statut</th>
+                        <th>Nombre de Patients</th>
+                        <th>Pourcentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="statusCount : ${statusCounts}">
+                        <td>
+                          <span
+                            class="badge"
+                            th:classappend="${statusCount[0].name() == 'ACTIVE'} ? 'bg-success' :
+                                               (${statusCount[0].name() == 'INACTIVE'} ? 'bg-secondary' :
+                                               (${statusCount[0].name() == 'DISCHARGED'} ? 'bg-info' : 'bg-warning'))"
+                            th:text="${statusCount[0].displayName}"
+                          >
+                          </span>
+                        </td>
+                        <td th:text="${statusCount[1]}">0</td>
+                        <td>
+                          <div class="progress">
+                            <div
+                              class="progress-bar"
+                              th:style="'width: ' + ${(statusCount[1] * 100.0 / totalPatients)} + '%'"
+                              th:text="${#numbers.formatDecimal((statusCount[1] * 100.0 / totalPatients), 1, 1)} + '%'"
+                            ></div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                  Actions Rapides
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 mb-2">
+                    <a href="/user/index" class="btn btn-primary btn-block">
+                      <i class="bi bi-list"></i> Voir tous les patients
+                    </a>
+                  </div>
+                  <div
+                    class="col-md-3 mb-2"
+                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                  >
+                    <a
+                      href="/admin/formPatients"
+                      class="btn btn-success btn-block"
+                    >
+                      <i class="bi bi-plus-circle"></i> Ajouter un patient
+                    </a>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <a href="/user/search" class="btn btn-info btn-block">
+                      <i class="bi bi-search"></i> Recherche avancée
+                    </a>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <a
+                      href="/api/patients/statistics"
+                      class="btn btn-outline-secondary btn-block"
+                      target="_blank"
+                    >
+                      <i class="bi bi-download"></i> Export JSON
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart.js Scripts -->
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script th:inline="javascript">
+        // Health Status Pie Chart
+        const healthCtx = document.getElementById('healthChart').getContext('2d');
+        const healthChart = new Chart(healthCtx, {
+          type: 'pie',
+          data: {
+            labels: ['En bonne santé', 'Malades'],
+            datasets: [{
+              data: [/*[[${healthyPatients}]]*/ 0, /*[[${sickPatients}]]*/ 0],
+              backgroundColor: ['#ffffff', '#000000'],
+              borderColor: ['#000000', '#000000'],
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+
+        // Status Bar Chart
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        const statusLabels = [];
+        const statusData = [];
+        const statusColors = [];
+
+        /*[# th:each="statusCount : ${statusCounts}"]*/
+        statusLabels.push('/*[[${statusCount[0].displayName}]]*/' );
+        statusData.push(/*[[${statusCount[1]}]]*/ 0);
+        statusColors.push(
+          /*[[${statusCount[0].name()}]]*/ === 'ACTIVE' ? '#000000' :
+          /*[[${statusCount[0].name()}]]*/ === 'INACTIVE' ? '#666666' :
+          /*[[${statusCount[0].name()}]]*/ === 'DISCHARGED' ? '#ffffff' : '#cccccc'
+        );
+        /*[/]*/
+
+        const statusChart = new Chart(statusCtx, {
+          type: 'bar',
+          data: {
+            labels: statusLabels,
+            datasets: [{
+              label: 'Nombre de patients',
+              data: statusData,
+              backgroundColor: statusColors,
+              borderColor: '#000000',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      </script>
+    </div>
+  </body>
+</html>

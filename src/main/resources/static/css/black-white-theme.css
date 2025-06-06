@@ -1,0 +1,397 @@
+/* Black and White Theme Override */
+
+/* Primary Colors - Black */
+.bg-primary,
+.navbar-dark.bg-primary,
+.btn-primary,
+.btn-outline-primary:hover,
+.badge.bg-primary,
+.modal-header.bg-primary,
+.table-dark,
+.progress-bar.bg-primary {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-primary {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.text-primary {
+  color: #000000 !important;
+}
+
+/* Success Colors - White with Black Border */
+.bg-success,
+.btn-success,
+.btn-outline-success:hover,
+.badge.bg-success,
+.progress-bar.bg-success,
+.alert-success {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.btn-outline-success {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-success:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Danger Colors - Black */
+.bg-danger,
+.btn-danger,
+.btn-outline-danger:hover,
+.badge.bg-danger,
+.progress-bar.bg-danger,
+.alert-danger {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-danger {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.text-danger {
+  color: #000000 !important;
+}
+
+/* Warning Colors - White with Black Border */
+.bg-warning,
+.btn-warning,
+.btn-outline-warning:hover,
+.badge.bg-warning,
+.progress-bar.bg-warning,
+.table-warning {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.btn-outline-warning {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-color: transparent !important;
+}
+
+/* Info Colors - White with Black Border */
+.bg-info,
+.btn-info,
+.btn-outline-info:hover,
+.badge.bg-info,
+.progress-bar.bg-info {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.btn-outline-info,
+.btn-outline-info:not(:hover) {
+  color: #000000 !important;
+  border-color: #000000 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-info:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Secondary Colors - Gray */
+.bg-secondary,
+.btn-secondary,
+.btn-outline-secondary:hover,
+.badge.bg-secondary {
+  background-color: #666666 !important;
+  border-color: #666666 !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-secondary {
+  color: #666666 !important;
+  border-color: #666666 !important;
+  background-color: transparent !important;
+}
+
+/* Dark Colors - Black */
+.bg-dark,
+.text-light {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Light Colors - White */
+.bg-light {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Navigation Pills */
+.nav-pills .nav-link {
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Progress Bars */
+.progress {
+  background-color: #f8f9fa !important;
+  border: 1px solid #000000 !important;
+}
+
+.progress-bar {
+  background-color: #000000 !important;
+}
+
+/* Cards */
+.card {
+  border: 1px solid #000000 !important;
+}
+
+.card-header {
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #000000 !important;
+  color: #000000 !important;
+}
+
+/* Tables */
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa !important;
+}
+
+.table th,
+.table td {
+  border-color: #000000 !important;
+}
+
+/* Alerts */
+.alert {
+  border: 1px solid #000000 !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+  border: 1px solid #000000 !important;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa !important;
+  color: #000000 !important;
+}
+
+/* Forms */
+.form-control:focus,
+.form-select:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Badges in specific contexts */
+.badge.bg-light {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+/* Modal */
+.modal-content {
+  border: 1px solid #000000 !important;
+}
+
+/* Footer */
+footer.bg-dark {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Custom utility classes */
+.text-black {
+  color: #000000 !important;
+}
+
+.text-white {
+  color: #ffffff !important;
+}
+
+.bg-black {
+  background-color: #000000 !important;
+}
+
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.border-black {
+  border-color: #000000 !important;
+}
+
+/* Dashboard specific styles */
+.border-left-primary,
+.border-left-success,
+.border-left-warning,
+.border-left-info {
+  border-left: 4px solid #000000 !important;
+}
+
+.text-gray-800 {
+  color: #000000 !important;
+}
+
+.text-xs {
+  font-size: 0.75rem !important;
+}
+
+.font-weight-bold {
+  font-weight: bold !important;
+}
+
+/* Chart legend colors override */
+.bi-circle-fill.text-success {
+  color: #ffffff !important;
+}
+
+.bi-circle-fill.text-danger {
+  color: #000000 !important;
+}
+
+/* Button block utility */
+.btn-block {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Additional comprehensive text color overrides */
+.text-success,
+.text-warning,
+.text-info,
+.text-muted {
+  color: #000000 !important;
+}
+
+/* Alert overrides */
+.alert-info {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.alert-success {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.alert-warning {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.alert-danger {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+/* Progress bar overrides for all contexts */
+.progress-bar.bg-success,
+.progress-bar.bg-warning,
+.progress-bar.bg-danger,
+.progress-bar.bg-info {
+  background-color: #000000 !important;
+}
+
+/* Badge status overrides */
+.badge.bg-success,
+.badge.bg-warning,
+.badge.bg-info,
+.badge.bg-danger {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+/* Card header overrides */
+.card-header.bg-info,
+.card-header.bg-success,
+.card-header.bg-warning,
+.card-header.bg-danger {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+/* Link colors */
+a {
+  color: #000000 !important;
+}
+
+a:hover {
+  color: #666666 !important;
+}
+
+/* Small text */
+small.text-muted {
+  color: #666666 !important;
+}
+
+/* Override any remaining Bootstrap color utilities */
+.text-primary,
+.text-secondary,
+.text-success,
+.text-danger,
+.text-warning,
+.text-info,
+.text-light,
+.text-dark {
+  color: #000000 !important;
+}
+
+/* Ensure white text on black backgrounds */
+.bg-primary *,
+.bg-dark *,
+.bg-secondary *,
+.navbar-dark * {
+  color: #ffffff !important;
+}
+
+/* Ensure black text on white/light backgrounds */
+.bg-light *,
+.bg-white *,
+.card-body *,
+.modal-body * {
+  color: #000000 !important;
+}

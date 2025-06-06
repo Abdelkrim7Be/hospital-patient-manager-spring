@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="template1"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <title>Recherche Avancée</title>
+  </head>
+  <body>
+    <div layout:fragment="content1">
+      <div class="container p-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>
+            <i class="bi bi-funnel text-black"></i>
+            Recherche Avancée
+          </h2>
+          <a href="/user/index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+          </a>
+        </div>
+
+        <!-- Search Form -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-search"></i> Critères de Recherche
+            </h5>
+          </div>
+          <div class="card-body">
+            <form method="get" th:action="@{/user/search}">
+              <div class="row g-3">
+                <!-- Name Search -->
+                <div class="col-md-6">
+                  <label for="name" class="form-label">
+                    <i class="bi bi-person"></i> Nom du Patient
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    th:value="${param.name}"
+                    placeholder="Rechercher par nom..."
+                  />
+                </div>
+
+                <!-- Health Status -->
+                <div class="col-md-6">
+                  <label for="isSick" class="form-label">
+                    <i class="bi bi-activity"></i> État de Santé
+                  </label>
+                  <select class="form-select" id="isSick" name="isSick">
+                    <option value="">Tous les états</option>
+                    <option
+                      value="false"
+                      th:selected="${param.isSick != null and param.isSick[0] == 'false'}"
+                    >
+                      En bonne santé
+                    </option>
+                    <option
+                      value="true"
+                      th:selected="${param.isSick != null and param.isSick[0] == 'true'}"
+                    >
+                      Malade
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Patient Status -->
+                <div class="col-md-6">
+                  <label for="status" class="form-label">
+                    <i class="bi bi-flag"></i> Statut Patient
+                  </label>
+                  <select class="form-select" id="status" name="status">
+                    <option value="">Tous les statuts</option>
+                    <option
+                      th:each="status : ${statuses}"
+                      th:value="${status}"
+                      th:text="${status.displayName}"
+                      th:selected="${param.status != null and param.status[0] == status.name()}"
+                    ></option>
+                  </select>
+                </div>
+
+                <!-- Score Range -->
+                <div class="col-md-3">
+                  <label for="minScore" class="form-label">
+                    <i class="bi bi-bar-chart"></i> Score Minimum
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="minScore"
+                    name="minScore"
+                    th:value="${param.minScore}"
+                    min="0"
+                    max="1000"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div class="col-md-3">
+                  <label for="maxScore" class="form-label">
+                    <i class="bi bi-bar-chart-fill"></i> Score Maximum
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="maxScore"
+                    name="maxScore"
+                    th:value="${param.maxScore}"
+                    min="0"
+                    max="1000"
+                    placeholder="1000"
+                  />
+                </div>
+
+                <!-- Page Size -->
+                <div class="col-md-6">
+                  <label for="size" class="form-label">
+                    <i class="bi bi-list-ol"></i> Résultats par page
+                  </label>
+                  <select class="form-select" id="size" name="size">
+                    <option
+                      value="5"
+                      th:selected="${param.size != null and param.size[0] == '5'}"
+                    >
+                      5
+                    </option>
+                    <option
+                      value="10"
+                      th:selected="${param.size == null or param.size[0] == '10'}"
+                    >
+                      10
+                    </option>
+                    <option
+                      value="20"
+                      th:selected="${param.size != null and param.size[0] == '20'}"
+                    >
+                      20
+                    </option>
+                    <option
+                      value="50"
+                      th:selected="${param.size != null and param.size[0] == '50'}"
+                    >
+                      50
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="col-12">
+                  <hr />
+                  <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="bi bi-search"></i> Rechercher
+                    </button>
+                    <a href="/user/search" class="btn btn-outline-secondary">
+                      <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                    </a>
+                    <a href="/user/index" class="btn btn-outline-info">
+                      <i class="bi bi-list"></i> Voir tous
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Search Results -->
+        <div th:if="${patients != null}" class="card shadow">
+          <div
+            class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0">
+              <i class="bi bi-check-circle"></i> Résultats de la Recherche
+            </h5>
+            <span class="badge bg-light text-black">
+              <span th:text="${#lists.size(patients)}"></span> résultat(s)
+              trouvé(s)
+            </span>
+          </div>
+          <div class="card-body">
+            <div th:if="${#lists.isEmpty(patients)}" class="text-center py-4">
+              <i class="bi bi-search display-1 text-muted"></i>
+              <h4 class="text-muted mt-3">Aucun patient trouvé</h4>
+              <p class="text-muted">
+                Essayez de modifier vos critères de recherche.
+              </p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(patients)}" class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Âge</th>
+                    <th>Email</th>
+                    <th>Statut Santé</th>
+                    <th>Score</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    th:each="p:${patients}"
+                    th:class="${p.isSick} ? 'table-warning' : ''"
+                  >
+                    <td>
+                      <span class="badge bg-secondary" th:text="${p.id}"></span>
+                    </td>
+                    <td>
+                      <strong th:text="${p.name}"></strong>
+                      <br />
+                      <small class="text-muted" th:text="${p.phone}"></small>
+                    </td>
+                    <td>
+                      <span th:text="${p.age}"></span> ans
+                      <br />
+                      <small
+                        class="text-muted"
+                        th:text="${#dates.format(p.birthday, 'dd/MM/yyyy')}"
+                      ></small>
+                    </td>
+                    <td>
+                      <a
+                        th:href="'mailto:' + ${p.email}"
+                        th:text="${p.email}"
+                        class="text-decoration-none"
+                      ></a>
+                    </td>
+                    <td>
+                      <span th:if="${p.isSick}" class="badge bg-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Malade
+                      </span>
+                      <span th:unless="${p.isSick}" class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> En bonne santé
+                      </span>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div
+                          class="progress me-2"
+                          style="width: 60px; height: 8px"
+                        >
+                          <div
+                            class="progress-bar"
+                            th:classappend="${p.score >= 700} ? 'bg-success' : (${p.score >= 400} ? 'bg-warning' : 'bg-danger')"
+                            role="progressbar"
+                            th:style="'width: ' + ${p.score / 10} + '%'"
+                            th:aria-valuenow="${p.score}"
+                            aria-valuemin="0"
+                            aria-valuemax="1000"
+                          ></div>
+                        </div>
+                        <small th:text="${p.score}"></small>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        class="badge"
+                        th:classappend="${p.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                           (${p.status.name() == 'INACTIVE'} ? 'bg-secondary' :
+                                           (${p.status.name() == 'DISCHARGED'} ? 'bg-info' : 'bg-warning'))"
+                        th:text="${p.statusDisplayName}"
+                      >
+                      </span>
+                    </td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a
+                          th:href="@{/user/patient/{id}(id=${p.id})}"
+                          class="btn btn-outline-info btn-sm"
+                          title="Voir détails"
+                        >
+                          <i class="bi bi-eye"></i>
+                        </a>
+                        <a
+                          th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                          th:href="@{/admin/editPatients(id=${p.id})}"
+                          class="btn btn-outline-success btn-sm"
+                          title="Modifier"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div
+              th:if="${pages != null and #arrays.length(pages) > 1}"
+              class="d-flex justify-content-center mt-3"
+            >
+              <nav>
+                <ul class="pagination">
+                  <li
+                    th:each="page,status:${pages}"
+                    class="page-item"
+                    th:classappend="${currentPage==status.index} ? 'active' : ''"
+                  >
+                    <a
+                      class="page-link"
+                      th:href="@{/user/search(page=${status.index}, size=${param.size}, name=${param.name}, isSick=${param.isSick}, status=${param.status}, minScore=${param.minScore}, maxScore=${param.maxScore})}"
+                      th:text="${status.index + 1}"
+                    >
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

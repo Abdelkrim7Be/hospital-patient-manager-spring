@@ -1,190 +1,894 @@
 <!DOCTYPE html>
 <html
-  lang="en"
+  lang="fr"
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="template1"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  layout:decorate="~{template1}"
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-    />
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Patient List - KAPital Hospital System" />
+    <title>🏥 Patient Management - KAPital Hospital</title>
   </head>
+
   <body>
     <div layout:fragment="content1">
-      <div class="container p-4">
-        <div class="card">
-          <div class="card-header fw-semibold fs-4">Liste des Patients</div>
-          <div class="card-body">
-            <form method="get" th:action="@{/user/index}">
-              <div class="input-group mb-3 w-50">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="Rechercher un patient"
-                  name="keyword"
-                  th:value="${keyword}"
-                />
-                <button class="btn btn-outline-secondary" type="submit">
-                  Rechercher
-                </button>
+      <!-- Hospital Header Section -->
+      <div class="container-fluid">
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm hospital-header-card">
+              <div class="card-body p-4">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <h1 class="mb-2 text-primary">
+                      <i class="bi bi-people-fill me-2"></i>
+                      Patient Management
+                    </h1>
+                    <p class="mb-0 text-muted">
+                      <i class="bi bi-hospital me-2"></i>
+                      KAPital Hospital Management System - Medical Database
+                    </p>
+                  </div>
+                  <div class="col-md-4 text-end">
+                    <div class="hospital-stats">
+                      <div class="row text-center">
+                        <div class="col-4">
+                          <div
+                            class="stat-card bg-primary text-white rounded p-2"
+                          >
+                            <i class="bi bi-people fs-4"></i>
+                            <div class="small">Total</div>
+                            <div
+                              class="fw-bold"
+                              th:text="${patients.totalElements}"
+                            >
+                              0
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div
+                            class="stat-card bg-success text-white rounded p-2"
+                          >
+                            <i class="bi bi-heart-pulse fs-4"></i>
+                            <div class="small">Actifs</div>
+                            <div
+                              class="fw-bold"
+                              th:text="${patients.totalElements - patients.totalElements/4}"
+                            >
+                              0
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div
+                            class="stat-card bg-warning text-white rounded p-2"
+                          >
+                            <i class="bi bi-exclamation-triangle fs-4"></i>
+                            <div class="small">Urgents</div>
+                            <div
+                              class="fw-bold"
+                              th:text="${patients.totalElements/10}"
+                            >
+                              0
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </form>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nom</th>
-                  <th>Date de naissance</th>
-                  <th>Malade</th>
-                  <th>Score</th>
-                  <th></th>
-                  <th
-                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-                  ></th>
-                  <th
-                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-                  ></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="p:${patients}">
-                  <td th:text="${p.id}"></td>
-                  <td th:text="${p.name}"></td>
-                  <td th:text="${p.birthday}"></td>
-                  <td th:text="${p.isSick}"></td>
-                  <td th:text="${p.score}"></td>
-                  <td>
-                    <button
-                      class="btn btn-primary"
-                      data-bs-toggle="modal"
-                      th:data-bs-target="'#detailsModal' + ${p.id}"
-                    >
-                      <i class="bi bi-eye-fill"></i>
-                    </button>
-                  </td>
-                  <td
-                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-                  >
-                    <a
-                      th:href="@{/admin/editPatients(id=${p.id}, keyword=${keyword}, page=${currentPage})}"
-                      class="btn btn-success"
-                    >
-                      <i class="bi bi-pencil-fill"> </i>
-                    </a>
-                  </td>
-                  <td
-                    th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-                  >
-                    <a
-                      th:href="@{/admin/delete(id=${p.id}, keyword=${keyword}, page=${currentPage})}"
-                      class="btn btn-danger"
-                      onclick="return confirm('Etes-vous sure?')"
-                    >
-                      <i class="bi bi-trash3-fill"> </i>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <ul class="nav nav-pills">
-              <li th:each="page,status:${pages}" class="me-1">
-                <a
-                  th:text="${status.index}+1"
-                  th:class="${currentPage==status.index ? 'btn btn-info' : 'btn btn-outline-info'}"
-                  th:href="@{/user/index(page=${status.index}, keyword=${keyword})}"
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical Alert System -->
+        <div class="row mb-3" th:if="${message}">
+          <div class="col-12">
+            <div
+              class="alert alert-success alert-dismissible fade show medical-alert"
+              role="alert"
+            >
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <strong>Succès médical :</strong>
+              <span th:text="${message}"></span>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hospital Search Panel -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-gradient-primary text-white">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-search me-2"></i>
+                  Recherche Médicale Avancée
+                </h5>
+              </div>
+              <div class="card-body">
+                <form
+                  method="get"
+                  th:action="@{/user/index}"
+                  class="hospital-search-form"
                 >
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <div class="form-floating">
+                        <input
+                          type="text"
+                          class="form-control border-2"
+                          id="keyword"
+                          name="keyword"
+                          th:value="${keyword}"
+                          placeholder="Nom du patient"
+                        />
+                        <label for="keyword">
+                          <i class="bi bi-person-search me-1"></i>
+                          Nom du patient
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating">
+                        <select
+                          class="form-select border-2"
+                          id="size"
+                          name="size"
+                        >
+                          <option value="5" th:selected="${size==5}">
+                            5 patients
+                          </option>
+                          <option value="10" th:selected="${size==10}">
+                            10 patients
+                          </option>
+                          <option value="20" th:selected="${size==20}">
+                            20 patients
+                          </option>
+                          <option value="50" th:selected="${size==50}">
+                            50 patients
+                          </option>
+                        </select>
+                        <label for="size">
+                          <i class="bi bi-list-ol me-1"></i>
+                          Résultats par page
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating">
+                        <select
+                          class="form-select border-2"
+                          id="status"
+                          name="status"
+                        >
+                          <option value="">Tous les statuts</option>
+                          <option
+                            value="ACTIVE"
+                            th:selected="${status == 'ACTIVE'}"
+                          >
+                            Actif
+                          </option>
+                          <option
+                            value="INACTIVE"
+                            th:selected="${status == 'INACTIVE'}"
+                          >
+                            Inactif
+                          </option>
+                          <option
+                            value="DISCHARGED"
+                            th:selected="${status == 'DISCHARGED'}"
+                          >
+                            Sorti
+                          </option>
+                        </select>
+                        <label for="status">
+                          <i class="bi bi-activity me-1"></i>
+                          Statut médical
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-md-2">
+                      <button
+                        type="submit"
+                        class="btn btn-primary h-100 w-100 btn-hospital-search"
+                      >
+                        <i class="bi bi-search me-1"></i>
+                        Rechercher
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical Actions Panel -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="medical-info">
+                <span class="badge bg-info text-dark fs-6 me-2">
+                  <i class="bi bi-clipboard-data me-1"></i>
+                  Page <span th:text="${patients.number + 1}">1</span> sur
+                  <span th:text="${patients.totalPages}">1</span>
+                </span>
+                <span class="badge bg-secondary fs-6">
+                  <i class="bi bi-people me-1"></i>
+                  <span th:text="${patients.totalElements}">0</span> patients au
+                  total
+                </span>
+              </div>
+              <div
+                class="medical-actions"
+                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+              >
+                <a
+                  th:href="@{/admin/formPatients}"
+                  class="btn btn-success btn-hospital-action"
+                >
+                  <i class="bi bi-person-plus-fill me-2"></i>
+                  Nouveau Patient
                 </a>
-              </li>
-            </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical Patients Table -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-light">
+                <h5 class="card-title mb-0 text-primary">
+                  <i class="bi bi-table me-2"></i>
+                  Registre Médical des Patients
+                </h5>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table
+                    class="table table-hover table-striped mb-0 hospital-table"
+                  >
+                    <thead class="table-dark">
+                      <tr>
+                        <th scope="col" class="text-center">
+                          <i class="bi bi-hash me-1"></i>ID
+                        </th>
+                        <th scope="col">
+                          <i class="bi bi-person me-1"></i>Patient
+                        </th>
+                        <th scope="col" class="text-center">
+                          <i class="bi bi-calendar-event me-1"></i>Date de
+                          Naissance
+                        </th>
+                        <th scope="col" class="text-center">
+                          <i class="bi bi-heart-pulse me-1"></i>État de Santé
+                        </th>
+                        <th scope="col" class="text-center">
+                          <i class="bi bi-speedometer2 me-1"></i>Score Médical
+                        </th>
+                        <th scope="col" class="text-center">
+                          <i class="bi bi-activity me-1"></i>Statut
+                        </th>
+                        <th
+                          scope="col"
+                          class="text-center"
+                          th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                        >
+                          <i class="bi bi-tools me-1"></i>Actions Médicales
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        th:each="patient : ${patients.content}"
+                        class="hospital-row"
+                      >
+                        <td class="text-center fw-bold">
+                          <span
+                            class="badge bg-light text-dark patient-id-badge"
+                          >
+                            #<span th:text="${patient.id}">1</span>
+                          </span>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div
+                              class="patient-avatar me-3"
+                              th:style="'background: linear-gradient(135deg, ' + (${patient.isSick} ? '#dc3545' : '#198754') + ', ' + (${patient.isSick} ? '#fd7e14' : '#20c997') + ')'"
+                            >
+                              <span
+                                th:text="${#strings.substring(patient.name, 0, 1)}"
+                                >P</span
+                              >
+                            </div>
+                            <div>
+                              <div
+                                class="fw-bold text-primary patient-name"
+                                th:text="${patient.name}"
+                              >
+                                Nom du Patient
+                              </div>
+                              <small
+                                class="text-muted"
+                                th:if="${patient.email}"
+                              >
+                                <i class="bi bi-envelope me-1"></i>
+                                <span th:text="${patient.email}"
+                                  >email@example.com</span
+                                >
+                              </small>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="text-center">
+                          <span class="badge bg-info text-dark medical-date">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <span
+                              th:text="${#dates.format(patient.birthday, 'dd/MM/yyyy')}"
+                              >01/01/1990</span
+                            >
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          <span
+                            th:class="'badge health-status-badge ' + (${patient.isSick} ? 'bg-danger' : 'bg-success')"
+                          >
+                            <i
+                              th:class="'bi ' + (${patient.isSick} ? 'bi-exclamation-triangle-fill' : 'bi-heart-pulse-fill') + ' me-1'"
+                            ></i>
+                            <span
+                              th:text="${patient.isSick} ? 'Malade' : 'Sain'"
+                              >État</span
+                            >
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          <div class="score-container">
+                            <div class="score-bar">
+                              <div
+                                class="score-progress"
+                                th:style="'width: ' + ${patient.score / 10} + '%; background-color: ' + (${patient.score < 300} ? '#dc3545' : (${patient.score < 600} ? '#fd7e14' : '#198754'))"
+                              ></div>
+                            </div>
+                            <strong
+                              th:class="'score-text ' + (${patient.score < 300} ? 'text-danger' : (${patient.score < 600} ? 'text-warning' : 'text-success'))"
+                              th:text="${patient.score}"
+                              >Score</strong
+                            >
+                          </div>
+                        </td>
+                        <td class="text-center">
+                          <span
+                            th:class="'badge ' + (${patient.status.name() == 'ACTIVE'} ? 'bg-success' : (${patient.status.name() == 'INACTIVE'} ? 'bg-warning text-dark' : 'bg-secondary'))"
+                          >
+                            <i
+                              th:class="'bi ' + (${patient.status.name() == 'ACTIVE'} ? 'bi-check-circle-fill' : (${patient.status.name() == 'INACTIVE'} ? 'bi-pause-circle-fill' : 'bi-dash-circle-fill')) + ' me-1'"
+                            ></i>
+                            <span th:text="${patient.status.name()}"
+                              >Status</span
+                            >
+                          </span>
+                        </td>
+                        <td
+                          class="text-center"
+                          th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                        >
+                          <div
+                            class="btn-group medical-actions-group"
+                            role="group"
+                          >
+                            <button
+                              type="button"
+                              class="btn btn-outline-info btn-sm"
+                              data-bs-toggle="modal"
+                              th:data-bs-target="'#patientModal' + ${patient.id}"
+                              title="Voir détails médicaux"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </button>
+                            <a
+                              th:href="@{/admin/editPatient(id=${patient.id}, keyword=${keyword}, page=${patients.number})}"
+                              class="btn btn-outline-warning btn-sm"
+                              title="Modifier le dossier"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </a>
+                            <button
+                              type="button"
+                              class="btn btn-outline-danger btn-sm"
+                              onclick="confirmMedicalDeletion(this)"
+                              th:data-url="@{/admin/deletePatient(id=${patient.id}, keyword=${keyword}, page=${patients.number})}"
+                              title="Supprimer le dossier"
+                            >
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hospital Pagination -->
+        <div class="row mt-4" th:if="${patients.totalPages > 1}">
+          <div class="col-12">
+            <nav aria-label="Navigation des patients">
+              <ul class="pagination justify-content-center hospital-pagination">
+                <li
+                  class="page-item"
+                  th:class="${patients.first} ? 'page-item disabled' : 'page-item'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/user/index(keyword=${keyword}, page=${patients.number - 1}, size=${size}, status=${status})}"
+                    aria-label="Précédent"
+                  >
+                    <i class="bi bi-chevron-left"></i>
+                    <span class="d-none d-md-inline ms-1">Précédent</span>
+                  </a>
+                </li>
+                <li
+                  th:each="pageNumber : ${#numbers.sequence(0, patients.totalPages - 1)}"
+                  class="page-item"
+                  th:class="${pageNumber == patients.number} ? 'page-item active' : 'page-item'"
+                  th:if="${pageNumber >= patients.number - 2 && pageNumber <= patients.number + 2}"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/user/index(keyword=${keyword}, page=${pageNumber}, size=${size}, status=${status})}"
+                    th:text="${pageNumber + 1}"
+                    >1</a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  th:class="${patients.last} ? 'page-item disabled' : 'page-item'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/user/index(keyword=${keyword}, page=${patients.number + 1}, size=${size}, status=${status})}"
+                    aria-label="Suivant"
+                  >
+                    <span class="d-none d-md-inline me-1">Suivant</span>
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>
 
-      <!-- Patient Details Modals -->
-      <div
-        th:each="p:${patients}"
-        th:id="'detailsModal' + ${p.id}"
-        class="modal fade"
-        tabindex="-1"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-              <h5 class="modal-title">Patient Details</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title" th:text="${p.name}"></h4>
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                      <strong>ID:</strong> <span th:text="${p.id}"></span>
-                    </li>
-                    <li class="list-group-item">
-                      <strong>Date de naissance:</strong>
-                      <span th:text="${p.birthday}"></span>
-                    </li>
-                    <li class="list-group-item">
-                      <strong>Malade:</strong>
-                      <span th:if="${p.isSick}" class="badge bg-danger"
-                        >Oui</span
+      <!-- Medical Patient Detail Modals -->
+      <div th:each="patient : ${patients.content}">
+        <div
+          class="modal fade"
+          th:id="'patientModal' + ${patient.id}"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                  <i class="bi bi-person-badge me-2"></i>
+                  Dossier Médical -
+                  <span th:text="${patient.name}">Patient</span>
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-8">
+                    <h6 class="text-primary">
+                      <i class="bi bi-info-circle me-1"></i>
+                      Informations Médicales
+                    </h6>
+                    <table class="table table-borderless">
+                      <tr>
+                        <td><strong>Nom complet :</strong></td>
+                        <td th:text="${patient.name}">Nom du patient</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Date de naissance :</strong></td>
+                        <td
+                          th:text="${#dates.format(patient.birthday, 'dd MMMM yyyy')}"
+                        >
+                          Date
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>Email :</strong></td>
+                        <td>
+                          <a
+                            th:href="'mailto:' + ${patient.email}"
+                            th:text="${patient.email}"
+                            >email@example.com</a
+                          >
+                        </td>
+                      </tr>
+                      <tr th:if="${patient.phone}">
+                        <td><strong>Téléphone :</strong></td>
+                        <td>
+                          <a
+                            th:href="'tel:' + ${patient.phone}"
+                            th:text="${patient.phone}"
+                            >+212 6XX XXX XXX</a
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>État de santé :</strong></td>
+                        <td>
+                          <span
+                            th:class="'badge ' + (${patient.isSick} ? 'bg-danger' : 'bg-success')"
+                          >
+                            <span
+                              th:text="${patient.isSick} ? 'Malade' : 'En bonne santé'"
+                              >État</span
+                            >
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><strong>Score médical :</strong></td>
+                        <td>
+                          <strong
+                            th:class="(${patient.score < 300} ? 'text-danger' : (${patient.score < 600} ? 'text-warning' : 'text-success'))"
+                            th:text="${patient.score} + '/1000'"
+                            >Score</strong
+                          >
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-4 text-center">
+                    <div
+                      class="patient-avatar-large mb-3"
+                      th:style="'background: linear-gradient(135deg, ' + (${patient.isSick} ? '#dc3545' : '#198754') + ', ' + (${patient.isSick} ? '#fd7e14' : '#20c997') + ')'"
+                    >
+                      <span th:text="${#strings.substring(patient.name, 0, 2)}"
+                        >PA</span
                       >
-                      <span th:unless="${p.isSick}" class="badge bg-success"
-                        >Non</span
+                    </div>
+                    <div class="health-indicator">
+                      <div
+                        th:class="'alert ' + (${patient.isSick} ? 'alert-danger' : 'alert-success') + ' text-center'"
                       >
-                    </li>
-                    <li class="list-group-item">
-                      <strong>Score:</strong>
-                      <div class="progress">
+                        <i
+                          th:class="'bi ' + (${patient.isSick} ? 'bi-exclamation-triangle' : 'bi-heart-pulse') + ' fs-4'"
+                        ></i>
                         <div
-                          class="progress-bar"
-                          role="progressbar"
-                          th:style="'width: ' + ${p.score} + '%'"
-                          th:aria-valuenow="${p.score}"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                          th:text="${p.score}"
-                        ></div>
+                          th:text="${patient.isSick} ? 'Patient nécessitant un suivi' : 'Patient en bonne santé'"
+                        >
+                          État de santé
+                        </div>
                       </div>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-3" th:if="${patient.notes}">
+                  <div class="col-12">
+                    <h6 class="text-primary">
+                      <i class="bi bi-clipboard2-pulse me-1"></i>
+                      Notes Médicales
+                    </h6>
+                    <div class="alert alert-info">
+                      <p class="mb-0" th:text="${patient.notes}">
+                        Notes médicales du patient...
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <a
-                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-                th:href="@{/admin/editPatients(id=${p.id}, keyword=${keyword}, page=${currentPage})}"
-                class="btn btn-success"
-              >
-                <i class="bi bi-pencil-fill"></i> Edit
-              </a>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  <i class="bi bi-x-circle me-1"></i>
+                  Fermer
+                </button>
+                <a
+                  th:href="@{/admin/editPatient(id=${patient.id})}"
+                  class="btn btn-primary"
+                  th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                >
+                  <i class="bi bi-pencil me-1"></i>
+                  Modifier le dossier
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Custom Hospital Styles -->
+      <style>
+        .hospital-header-card {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          border-left: 5px solid var(--hospital-primary);
+        }
+
+        .stat-card {
+          transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+          transform: scale(1.05);
+        }
+
+        .medical-alert {
+          border-left: 5px solid #198754;
+          background: linear-gradient(135deg, #d1e7dd 0%, #f8f9fa 100%);
+        }
+
+        .bg-gradient-primary {
+          background: linear-gradient(
+            135deg,
+            var(--hospital-primary) 0%,
+            #0056b3 100%
+          );
+        }
+
+        .hospital-search-form .form-floating > .form-control {
+          border: 2px solid #e9ecef;
+          transition: all 0.3s ease;
+        }
+
+        .hospital-search-form .form-floating > .form-control:focus {
+          border-color: var(--hospital-primary);
+          box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+        }
+
+        .btn-hospital-search {
+          background: linear-gradient(
+            135deg,
+            var(--hospital-primary) 0%,
+            #0056b3 100%
+          );
+          border: none;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .btn-hospital-search:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-hospital-action {
+          background: linear-gradient(135deg, #198754 0%, #0f5132 100%);
+          border: none;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .btn-hospital-action:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+        }
+
+        .hospital-table {
+          font-size: 0.9rem;
+        }
+
+        .hospital-row {
+          transition: all 0.2s ease;
+        }
+
+        .hospital-row:hover {
+          background-color: rgba(13, 110, 253, 0.05);
+          transform: translateY(-1px);
+        }
+
+        .patient-avatar {
+          width: 45px;
+          height: 45px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 1.2rem;
+          font-weight: bold;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .patient-avatar-large {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 2rem;
+          font-weight: bold;
+          margin: 0 auto;
+          border: 4px solid white;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .patient-name {
+          font-size: 1rem;
+          margin-bottom: 2px;
+        }
+
+        .patient-id-badge {
+          font-weight: 600;
+          padding: 0.4rem 0.6rem;
+        }
+
+        .medical-date {
+          padding: 0.4rem 0.8rem;
+          font-weight: 500;
+        }
+
+        .score-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.25rem;
+        }
+
+        .score-bar {
+          width: 60px;
+          height: 8px;
+          background-color: #e9ecef;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .score-progress {
+          height: 100%;
+          transition: all 0.3s ease;
+          border-radius: 4px;
+        }
+
+        .score-text {
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+
+        .medical-actions-group .btn {
+          padding: 0.25rem 0.5rem;
+          margin: 0 1px;
+          border-radius: 0.375rem;
+          transition: all 0.2s ease;
+        }
+
+        .medical-actions-group .btn:hover {
+          transform: translateY(-1px);
+        }
+
+        .hospital-pagination .page-link {
+          border: 2px solid #e9ecef;
+          color: var(--hospital-primary);
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+
+        .hospital-pagination .page-item.active .page-link {
+          background: linear-gradient(
+            135deg,
+            var(--hospital-primary) 0%,
+            #0056b3 100%
+          );
+          border-color: var(--hospital-primary);
+        }
+
+        .hospital-pagination .page-link:hover {
+          background-color: rgba(13, 110, 253, 0.1);
+          border-color: var(--hospital-primary);
+          transform: translateY(-1px);
+        }
+
+        .health-indicator {
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .hospital-stats .col-4 {
+            margin-bottom: 0.5rem;
+          }
+
+          .stat-card {
+            padding: 0.5rem;
+          }
+
+          .medical-actions-group {
+            flex-direction: column;
+          }
+
+          .medical-actions-group .btn {
+            margin: 1px 0;
+          }
+        }
+      </style>
+
+      <!-- Medical JavaScript Functions -->
+      <script>
+        function confirmMedicalDeletion(button) {
+          const url = button.getAttribute("data-url");
+          const patientName = button
+            .closest("tr")
+            .querySelector(".patient-name")
+            .textContent.trim();
+
+          if (
+            confirm(
+              `⚠️ ATTENTION MÉDICALE\n\nÊtes-vous sûr de vouloir supprimer définitivement le dossier médical de :\n"${patientName}"\n\n❌ Cette action est irréversible et supprimera toutes les données médicales associées.`
+            )
+          ) {
+            window.location.href = url;
+          }
+        }
+
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener("DOMContentLoaded", function () {
+          const alerts = document.querySelectorAll(".alert:not(.alert-info)");
+          alerts.forEach(function (alert) {
+            setTimeout(function () {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }, 5000);
+          });
+        });
+
+        // Enhanced search form submission
+        document
+          .querySelector(".hospital-search-form")
+          .addEventListener("submit", function (e) {
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+
+            submitButton.innerHTML =
+              '<i class="bi bi-hourglass-split me-1"></i>Recherche...';
+            submitButton.disabled = true;
+
+            setTimeout(function () {
+              submitButton.innerHTML = originalText;
+              submitButton.disabled = false;
+            }, 1000);
+          });
+      </script>
     </div>
   </body>
 </html>

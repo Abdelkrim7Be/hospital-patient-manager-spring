@@ -1,51 +1,346 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css">
+<html
+  lang="fr"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Système de Gestion Hospitalière - Gestion des Patients"
+    />
+    <meta
+      name="keywords"
+      content="hôpital, patients, santé, gestion médicale"
+    />
+    <meta name="author" content="Système Hospitalier ENSET" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Custom Hospital Theme -->
+    <link rel="stylesheet" href="/css/black-white-theme.css" />
+
+    <!-- Bootstrap JavaScript -->
     <script src="/webjars/bootstrap/5.3.5/js/bootstrap.bundle.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-1">
-        <a class="navbar-brand" href="#">Gestion des patients</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+
+    <title th:text="#{hospital.title} + ' - ' + #{hospital.subtitle}">
+      🏥 KAPital Hospital - Patient Management System
+    </title>
+
+    <!-- Hospital Specific Styles -->
+    <style>
+      :root {
+        --hospital-primary: #0d6efd;
+        --hospital-secondary: #6c757d;
+        --hospital-success: #198754;
+        --hospital-danger: #dc3545;
+        --hospital-warning: #ffc107;
+        --hospital-info: #0dcaf0;
+        --hospital-light: #f8f9fa;
+        --hospital-dark: #212529;
+      }
+
+      .hospital-navbar {
+        background: linear-gradient(
+          135deg,
+          var(--hospital-primary) 0%,
+          #0056b3 100%
+        );
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        border-bottom: 3px solid var(--hospital-success);
+      }
+
+      .hospital-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .hospital-icon {
+        font-size: 1.8rem;
+        margin-right: 0.5rem;
+        color: #ffffff;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .navbar-nav .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 0.75rem 1rem !important;
+        border-radius: 0.375rem;
+        margin: 0 0.25rem;
+      }
+
+      .navbar-nav .nav-link:hover {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-radius: 0.75rem;
+      }
+
+      .dropdown-item {
+        padding: 0.75rem 1.25rem;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: var(--hospital-light);
+        color: var(--hospital-primary);
+        transform: translateX(5px);
+      }
+
+      .main-content {
+        min-height: calc(100vh - 200px);
+        padding-top: 2rem;
+      }
+
+      .hospital-footer {
+        background: var(--hospital-dark);
+        color: var(--hospital-light);
+        padding: 2rem 0;
+        margin-top: 3rem;
+        border-top: 3px solid var(--hospital-primary);
+      }
+
+      .patient-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .patient-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .health-status-badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+      }
+
+      .patient-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--hospital-primary),
+          var(--hospital-info)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body class="bg-light">
+    <!-- Hospital Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark hospital-navbar">
+      <div class="container-fluid">
+        <!-- Hospital Brand -->
+        <a class="navbar-brand hospital-brand" href="/" th:href="@{/}">
+          <i class="bi bi-hospital-fill hospital-icon"></i>
+          <span th:text="#{hospital.name}">🏥 KAPital Hospital</span>
+        </a>
+
+        <!-- Mobile Toggle Button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#hospitalNavbar"
+          aria-controls="hospitalNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" th:href="@{/user/index}">Home</a>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/user/index}">
+                <i class="bi bi-house"></i> Accueil
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/user/dashboard}">
+                <i class="bi bi-graph-up"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/user/test-info}">
+                <i class="bi bi-info-circle"></i> Test Info
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="bi bi-people"></i> Patients
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li>
+                  <a class="dropdown-item" th:href="@{/user/index}">
+                    <i class="bi bi-list"></i> Liste des Patients
+                  </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                <li>
+                  <a class="dropdown-item" th:href="@{/user/search}">
+                    <i class="bi bi-search"></i> Recherche Avancée
+                  </a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Patients
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="dropdown-item" th:href="@{/admin/formPatients}">Nouveau</a>
-                        <a class="dropdown-item" th:href="@{/user/index}">Chercher</a>
-                    </div>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                  <hr class="dropdown-divider" />
                 </li>
-            </ul>
-            <ul class="navbar-nav mr-auto w-100 justify-content-end">
-                <li class="nav-item dropdown">
-                    <button class="nav-link dropdown-toggle" id="navbarDropdown1" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                    th:text="${#authentication.name}">
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                        <a class="dropdown-item" th:href="@{/user/index}">Compte</a>
-<!--                        <a class="dropdown-item" th:href="@{/logout}">Logout</a>-->
-                        <form method="post" th:action="@{/logout}"><button type="submit" class="btn btn-default">Logout</button></form>
-                    </div>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                  <a class="dropdown-item" th:href="@{/admin/formPatients}">
+                    <i class="bi bi-plus-circle"></i> Nouveau Patient
+                  </a>
                 </li>
-            </ul>
+              </ul>
+            </li>
+            <li
+              class="nav-item dropdown"
+              th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+            >
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="adminDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="bi bi-gear"></i> Administration
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                <li>
+                  <a class="dropdown-item" href="/h2-console" target="_blank">
+                    <i class="bi bi-database"></i> Console H2
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="/api/patients/statistics"
+                    target="_blank"
+                  >
+                    <i class="bi bi-file-earmark-code"></i> API Statistiques
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
 
+          <!-- User Menu -->
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="bi bi-person-circle"></i>
+                <span th:text="${#authentication.name}">Utilisateur</span>
+                <span
+                  class="badge bg-light text-primary ms-1"
+                  th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                  >Admin</span
+                >
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <h6 class="dropdown-header">
+                    <i class="bi bi-person"></i>
+                    <span th:text="${#authentication.name}"></span>
+                  </h6>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" th:href="@{/user/dashboard}">
+                    <i class="bi bi-speedometer2"></i> Mon Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" th:href="@{/user/index}">
+                    <i class="bi bi-list-ul"></i> Mes Patients
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form method="post" th:action="@{/logout}" class="d-inline">
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
-    <section layout:fragment="content1"></section>
-</body>
+
+    <!-- Main Content -->
+    <main>
+      <section layout:fragment="content1"></section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="bi bi-hospital"></i> KAPital Hospital System</h6>
+            <p class="mb-0">Modern and efficient patient management</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <small>
+              <i class="bi bi-shield-check"></i>
+              Secure System - © 2025 KAPital Hospital Management
+            </small>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

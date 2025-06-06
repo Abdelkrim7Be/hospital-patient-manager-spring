@@ -1,41 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css">
-    <title>Authentication</title>
-</head>
-<body class="bg-light">
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Login</h4>
-                </div>
-                <div class="card-body p-4">
-                    <form th:action="@{/login}" method="post">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required autofocus>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Sign In</button>
-                        </div>
-                        <div class="text-center mt-3" th:if="${param.error}">
-                            <p class="text-danger">Invalid username or password</p>
-                        </div>
-                    </form>
-                </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap/5.3.5/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <title>Connexion - Système Hospitalier</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .login-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      }
+      .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px 15px 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 col-lg-5 col-xl-4">
+          <div class="card login-card">
+            <div class="card-header login-header text-white text-center py-4">
+              <div class="mb-3">
+                <i class="bi bi-hospital display-4"></i>
+              </div>
+              <h3 class="mb-0">Système Hospitalier</h3>
+              <p class="mb-0 opacity-75">Gestion des Patients</p>
             </div>
+            <div class="card-body p-5">
+              <!-- Success Message -->
+              <div
+                th:if="${param.logout}"
+                class="alert alert-success alert-dismissible fade show"
+                role="alert"
+              >
+                <i class="bi bi-check-circle"></i> Vous avez été déconnecté avec
+                succès.
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                ></button>
+              </div>
+
+              <!-- Error Message -->
+              <div
+                th:if="${param.error}"
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                <i class="bi bi-exclamation-triangle"></i> Nom d'utilisateur ou
+                mot de passe incorrect.
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                ></button>
+              </div>
+
+              <form th:action="@{/login}" method="post">
+                <div class="mb-4">
+                  <label for="username" class="form-label">
+                    <i class="bi bi-person"></i> Nom d'utilisateur
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person-fill"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      name="username"
+                      placeholder="Entrez votre nom d'utilisateur"
+                      required
+                      autofocus
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="password" class="form-label">
+                    <i class="bi bi-lock"></i> Mot de passe
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-lock-fill"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Entrez votre mot de passe"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="d-grid gap-2 mb-4">
+                  <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> Se Connecter
+                  </button>
+                </div>
+              </form>
+
+              <!-- Demo Credentials -->
+              <div class="card bg-light">
+                <div class="card-body">
+                  <h6 class="card-title">
+                    <i class="bi bi-info-circle"></i> Comptes de démonstration
+                  </h6>
+                  <div class="row">
+                    <div class="col-6">
+                      <small class="text-muted">
+                        <strong>Admin:</strong><br />
+                        admin / 1234
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <small class="text-muted">
+                        <strong>Utilisateur:</strong><br />
+                        user1 / 1234
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer text-center text-muted py-3">
+              <small>
+                <i class="bi bi-shield-check"></i>
+                Système sécurisé - © 2024 Hôpital Management
+              </small>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-<script src="/webjars/bootstrap/5.3.5/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="/webjars/bootstrap/5.3.5/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
